@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KinCare Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Clickable prototype of KinCare: verified caregivers and proof of every visit for families caring for parents from another city. IT for Managers Capstone, Section 4, Group 5.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --leaf:#1F4D3B; --leaf-2:#2C6650; --leaf-soft:#E3EDE7; --leaf-faint:#F1F6F2;
+  --marigold:#E39A2D; --marigold-deep:#9A5B05; --marigold-soft:#FBEBCF;
+  --mist:#EAEEEA; --paper:#FFFFFF; --ink:#1C2623; --ink-2:#4F5C57; --ink-3:#7A8781;
+  --line:#D6DDD8; --line-2:#E8ECE9; --hover:#DFE5E0;
+  --alert:#B43A2A; --alert-soft:#F7E1DC; --alert-deep:#7E2316;
+  --dp:#36407A; --dp-soft:#E6E8F3;
+  --bezel:#1C2623;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --r-lg:22px; --r-md:14px; --r-sm:10px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+/* page chrome follows the viewer's theme; the phone always shows the app's light design */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --leaf:#5BA884; --leaf-2:#6DB892; --leaf-soft:#1F3A2F; --leaf-faint:#17241F;
+  --marigold:#E9A646; --marigold-deep:#F0B861; --marigold-soft:#3A2C12;
+  --mist:#111916; --paper:#1A2420; --ink:#E4EBE7; --ink-2:#B1BEB7; --ink-3:#86948D;
+  --line:#34443D; --line-2:#25322D; --hover:#22302A;
+  --dp:#AEB6F0; --dp-soft:#262B4A; color-scheme:dark; } }
+:root[data-theme="dark"]{ --leaf:#5BA884; --leaf-2:#6DB892; --leaf-soft:#1F3A2F; --leaf-faint:#17241F;
+  --marigold:#E9A646; --marigold-deep:#F0B861; --marigold-soft:#3A2C12;
+  --mist:#111916; --paper:#1A2420; --ink:#E4EBE7; --ink-2:#B1BEB7; --ink-3:#86948D;
+  --line:#34443D; --line-2:#25322D; --hover:#22302A;
+  --dp:#AEB6F0; --dp-soft:#262B4A; color-scheme:dark; }
+.phone{ --leaf:#1F4D3B; --leaf-2:#2C6650; --leaf-soft:#E3EDE7; --leaf-faint:#F1F6F2;  --marigold:#E39A2D; --marigold-deep:#9A5B05; --marigold-soft:#FBEBCF;  --mist:#EAEEEA; --paper:#FFFFFF; --ink:#1C2623; --ink-2:#4F5C57; --ink-3:#7A8781;  --line:#D6DDD8; --line-2:#E8ECE9; --hover:#DFE5E0;  --alert:#B43A2A; --alert-soft:#F7E1DC; --alert-deep:#7E2316;  --dp:#36407A; --dp-soft:#E6E8F3;  --bezel:#1C2623; color-scheme:light; color:var(--ink) }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--mist);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--marigold);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- page layout ---------- */
+.stage{display:grid;grid-template-columns:minmax(260px,330px) auto minmax(260px,320px);gap:48px;justify-content:center;align-items:start;padding-block:40px 56px;padding-left:max(32px, env(safe-area-inset-left, 0px));padding-right:max(32px, env(safe-area-inset-right, 0px));max-width:1320px;margin:0 auto}
+.side{position:sticky;top:32px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.brand-mark{width:40px;height:40px}
+.brand h1{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.02em;margin:0;line-height:1}
+.intro{color:var(--ink-2);margin:0 0 6px;max-width:34ch}
+.credit{color:var(--ink-3);font-size:14px;margin:0 0 26px}
+.side h2{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:28px}
+.role-btn{display:flex;gap:10px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--paper);border-radius:var(--r-md);padding:9px 10px;transition:border-color .2s,background .2s}
+.role-btn:hover{border-color:var(--leaf-2)}
+.role-btn[aria-pressed="true"]{border-color:var(--leaf);background:var(--leaf);color:var(--paper)}
+.role-btn[aria-pressed="true"] .role-sub{color:var(--paper);opacity:.8}
+.role-btn .av{flex:none}
+.role-name{font-weight:700;font-size:14px;line-height:1.2}
+.role-sub{font-size:12.5px;color:var(--ink-3);line-height:1.2}
+.moments{list-style:none;margin:0;padding:0;counter-reset:m}
+.moments li{counter-increment:m}
+.moment{width:100%;display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;text-align:left;background:none;border:0;padding:8px 6px;border-radius:var(--r-sm);color:var(--ink)}
+.moment:hover{background:var(--hover)}
+.moment::before{content:counter(m);font-family:var(--display);font-weight:600;font-size:13px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--ink-2);background:var(--paper);transition:all .25s}
+.moment.done::before{content:"";background:var(--leaf) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--leaf)}
+.moment span{font-size:14.5px;line-height:1.35}
+.moment small{display:block;color:var(--ink-3);font-size:12.5px}
+.reset{margin-top:16px;background:none;border:0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;padding:4px 6px;font-size:14px}
+
+/* right panel */
+.req-now{background:var(--paper);border-radius:var(--r-lg);padding:20px;margin-bottom:22px;border:1px solid var(--line-2)}
+.req-now h2{margin-bottom:4px}
+.req-screen{color:var(--ink-3);font-size:14px;margin:0 0 14px}
+.req-item{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line-2)}
+.req-item:first-of-type{border-top:0;padding-top:0}
+.tag{font-family:var(--display);font-weight:600;font-size:12.5px;padding:2px 8px;border-radius:999px;background:var(--leaf-soft);color:var(--leaf);height:fit-content;white-space:nowrap}
+.tag.br{background:var(--marigold-soft);color:var(--marigold-deep)}
+.tag.dp{background:var(--dp-soft);color:var(--dp)}
+.req-item p{margin:0;font-size:14px;color:var(--ink-2)}
+.cover h2 span{font-family:var(--body);font-weight:400;color:var(--ink-3);font-size:14px;margin-left:6px}
+.cover-bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:4px 0 14px}
+.cover-bar i{display:block;height:100%;width:0;background:var(--leaf);border-radius:6px;transition:width .6s var(--ease)}
+.cover-grid{display:flex;flex-wrap:wrap;gap:6px}
+.chip-cov{font-family:var(--display);font-weight:600;font-size:12.5px;padding:4px 9px;border-radius:999px;border:1.5px dashed var(--line);color:var(--ink-3);background:transparent;transition:all .35s var(--ease)}
+.chip-cov.on{border-style:solid;border-color:var(--leaf);background:var(--leaf);color:var(--paper)}
+.chip-cov.on.br{border-color:var(--marigold);background:var(--marigold);color:#2B1A00}
+.chip-cov.on.dp{border-color:var(--dp);background:var(--dp);color:var(--paper)}
+.chip-cov.pop{animation:pop .5s var(--ease)}
+@keyframes pop{40%{transform:scale(1.15)}}
+.legend{font-size:12.5px;color:var(--ink-3);margin-top:12px}
+
+/* ---------- phone ---------- */
+.phone-col{display:flex;flex-direction:column;align-items:center;gap:14px}
+.phone{width:392px;height:820px;border-radius:54px;background:var(--bezel);padding:11px;position:relative;box-shadow:0 40px 70px -30px rgba(28,38,35,.45),0 0 0 1.5px #39463F inset}
+.screenwrap{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;background:var(--paper);isolation:isolate}
+.statusbar{position:absolute;top:0;left:0;right:0;height:48px;display:flex;justify-content:space-between;align-items:center;padding:6px 30px 0 34px;font-weight:700;font-size:15px;z-index:30;pointer-events:none;transition:color .3s}
+.statusbar.dark{color:#fff}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:112px;height:32px;border-radius:20px;background:#000;z-index:31}
+.sb-icons{display:flex;gap:6px;align-items:center}
+.sb-icons svg{width:18px;height:18px}
+.viewport{position:absolute;inset:0}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--leaf-faint);will-change:transform}
+.screen.white{background:var(--paper)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:52px 18px 24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.enter-fwd{animation:inR .42s var(--ease) both}
+.leave-fwd{animation:outL .42s var(--ease) both}
+.enter-back{animation:inL .42s var(--ease) both}
+.leave-back{animation:outR .42s var(--ease) both}
+.enter-fade{animation:fadeIn .35s ease both}
+.leave-fade{animation:fadeOut .25s ease both}
+@keyframes inR{from{transform:translateX(100%)}to{transform:none}}
+@keyframes outL{to{transform:translateX(-28%);filter:brightness(.92)}}
+@keyframes inL{from{transform:translateX(-28%);filter:brightness(.92)}to{transform:none}}
+@keyframes outR{to{transform:translateX(100%)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes fadeOut{to{opacity:0}}
+.phone-caption{font-size:14px;color:var(--ink-3);text-align:center;max-width:390px;min-height:20px}
+
+/* ---------- in-app components ---------- */
+.appbar{display:flex;align-items:center;gap:8px;margin:0 -6px 14px;min-height:40px}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;color:var(--ink)}
+.iconbtn:hover{background:rgba(28,38,35,.06)}
+.appbar h2{font-family:var(--display);font-weight:600;font-size:19px;margin:0;letter-spacing:-.01em;flex:1}
+.hello{font-family:var(--display);font-weight:600;font-size:26px;letter-spacing:-.02em;margin:6px 0 2px;line-height:1.15}
+.muted{color:var(--ink-2)}
+.small{font-size:13.5px}
+.tiny{font-size:12.5px;color:var(--ink-3)}
+.ic{width:20px;height:20px;flex:none}
+.ic-sm{width:16px;height:16px;flex:none}
+.surface{background:var(--paper);border-radius:var(--r-lg);padding:16px}
+.stack>*+*{margin-top:12px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:600;font-size:16px;background:var(--marigold-soft);color:var(--marigold-deep);flex:none}
+.av.leaf{background:var(--leaf-soft);color:var(--leaf)}
+.av.sm{width:34px;height:34px;font-size:13px}
+.av.lg{width:64px;height:64px;font-size:22px}
+.av.xl{width:120px;height:120px;font-size:42px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:var(--r-md);padding:14px 16px;font-weight:700;font-size:16px;background:var(--leaf);color:#fff;transition:transform .12s,background .2s}
+.btn:hover{background:var(--leaf-2)}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--leaf);border:1.5px solid var(--leaf)}
+.btn.ghost:hover{background:var(--leaf-faint)}
+.btn.danger{background:var(--alert)}
+.btn.danger:hover{background:var(--alert-deep)}
+.btn.amber{background:var(--marigold);color:#2B1A00}
+.btn[disabled]{background:#B8C2BC;cursor:not-allowed;transform:none}
+.btn.sm{padding:9px 12px;font-size:14px;width:auto;border-radius:var(--r-sm)}
+.linkbtn{background:none;border:0;color:var(--leaf);font-weight:700;padding:4px 0;font-size:14.5px}
+.label{font-weight:700;font-size:14px;margin:0 0 6px;display:block}
+.field{width:100%;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:11px 12px;background:var(--paper);font-size:15.5px}
+.field:focus{outline:none;border-color:var(--leaf)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line-2);border-radius:var(--r-md);padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:11px;padding:10px;font-weight:700;font-size:14.5px;color:var(--ink-2);transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(28,38,35,.12)}
+.checkrow{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r-md);border:1.5px solid var(--line);background:var(--paper);cursor:pointer;transition:border-color .2s,background .2s}
+.checkrow.on{border-color:var(--leaf);background:var(--leaf-faint)}
+.box{width:24px;height:24px;border-radius:7px;border:2px solid #9AA7A0;display:grid;place-items:center;flex:none;transition:all .2s;background:#fff}
+.checkrow.on .box{background:var(--leaf);border-color:var(--leaf)}
+.box svg{width:15px;height:15px;opacity:0;transform:scale(.5);transition:all .2s var(--ease)}
+.checkrow.on .box svg{opacity:1;transform:none}
+.pillset{display:flex;flex-wrap:wrap;gap:6px}
+.pill{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;color:var(--ink-2)}
+.pill[aria-pressed="true"]{border-color:var(--leaf);background:var(--leaf);color:#fff}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.vbadge{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;padding:3px 8px 3px 6px;border-radius:999px;background:var(--leaf-soft);color:var(--leaf)}
+.vbadge.no{background:#EEE6D8;color:#8A6A33}
+.vbadge svg{width:13px;height:13px}
+.banner{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r-lg);padding:14px;background:var(--alert);color:#fff;cursor:pointer;border:0;width:100%;text-align:left;animation:dropIn .55s var(--ease) both}
+.banner .ic{margin-top:2px}
+.banner b{display:block;font-size:15.5px}
+.banner span{font-size:13.5px;opacity:.92}
+.banner.calm{background:var(--marigold-soft);color:var(--ink)}
+@keyframes dropIn{from{transform:translateY(-14px);opacity:0}}
+.divider{height:1px;background:var(--line-2);margin:4px 0}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:15px}
+.kv span:first-child{color:var(--ink-2)}
+.kv.total{font-weight:700;font-size:17px;border-top:1.5px solid var(--line);margin-top:6px;padding-top:12px}
+.note{font-size:13px;color:var(--ink-3);display:flex;gap:6px;align-items:flex-start}
+.note .ic-sm{margin-top:2px}
+
+/* tab bar */
+.tabbar{display:flex;justify-content:space-around;padding:8px 6px 24px;background:var(--paper);border-top:1px solid var(--line-2);flex:none}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;font-size:11.5px;font-weight:700;color:var(--ink-3);padding:4px 8px;border-radius:12px;position:relative;min-width:62px}
+.tab[aria-current="page"]{color:var(--leaf)}
+.tab .dot{position:absolute;top:2px;right:16px;width:9px;height:9px;border-radius:50%;background:var(--alert);border:2px solid #fff}
+
+/* home: parent card */
+.parent-card{background:var(--leaf);color:#fff;border-radius:var(--r-lg);padding:18px;position:relative;overflow:hidden}
+.parent-card .muted{color:#BFD4C8}
+.parent-card .av{background:var(--marigold);color:#2B1A00}
+.status-line{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;border-radius:var(--r-md);background:rgba(255,255,255,.1);font-size:14.5px}
+.live{width:9px;height:9px;border-radius:50%;background:var(--marigold);flex:none;position:relative}
+.live.ok{background:#8FD3A8}
+.live.bad{background:#FF9A88}
+.live::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid currentColor;opacity:0;animation:ping 2s ease-out infinite}
+.live.ok::after{color:#8FD3A8}.live.bad::after{color:#FF9A88}.live::after{color:var(--marigold)}
+@keyframes ping{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+.ringwrap{display:flex;align-items:center;gap:14px}
+.ring{width:58px;height:58px;flex:none}
+.ring circle{fill:none;stroke-width:6}
+.ring .bg{stroke:rgba(255,255,255,.18)}
+.ring .fg{stroke:var(--marigold);stroke-linecap:round;transition:stroke-dashoffset .8s var(--ease);transform:rotate(-90deg);transform-origin:center}
+.ring text{fill:#fff;font-family:var(--display);font-weight:600;font-size:15px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qa{background:var(--paper);border:0;border-radius:var(--r-lg);padding:14px;text-align:left;display:flex;flex-direction:column;gap:18px;min-height:96px;transition:transform .15s}
+.qa:active{transform:scale(.98)}
+.qa .qi{width:36px;height:36px;border-radius:11px;background:var(--leaf-soft);color:var(--leaf);display:grid;place-items:center}
+.qa b{font-size:15px;line-height:1.2}
+.qa small{display:block;color:var(--ink-3);font-weight:400;font-size:12.5px}
+.plan{display:flex;gap:12px;align-items:center}
+.daystrip{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;margin-top:10px}
+.daystrip i{height:8px;border-radius:3px;background:var(--line)}
+.daystrip i.done{background:var(--leaf-2)}
+.daystrip i.today{background:var(--marigold)}
+
+/* caregiver list */
+.cg{display:flex;gap:12px;background:var(--paper);border-radius:var(--r-lg);padding:14px;border:1.5px solid transparent;width:100%;text-align:left;transition:border-color .2s}
+.cg:hover{border-color:var(--line)}
+.cg h3{margin:0;font-size:16px}
+.cg .meta{font-size:13.5px;color:var(--ink-2);margin:2px 0 8px}
+.rate{font-family:var(--display);font-weight:600;font-size:16px;white-space:nowrap}
+.hidden-note{display:flex;gap:10px;padding:12px;border-radius:var(--r-md);background:var(--paper);border:1.5px dashed var(--line);color:var(--ink-2);font-size:13.5px}
+
+/* checkout + success */
+.check-anim{width:96px;height:96px;margin:28px auto 10px;display:block}
+.check-anim circle{fill:var(--leaf-soft);transform-origin:center;animation:grow .5s var(--ease) both}
+.check-anim path{fill:none;stroke:var(--leaf);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .35s var(--ease) forwards}
+@keyframes grow{from{transform:scale(0)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.center{text-align:center}
+.bigtitle{font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:-.02em;margin:6px 0}
+
+/* timeline */
+.tl{position:relative;padding-left:30px;margin-top:8px}
+.tl::before{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.ev{position:relative;padding:0 0 18px}
+.ev::before{content:"";position:absolute;left:-26px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--leaf)}
+.ev.pending::before{border-color:#AEB9B3;border-style:dashed}
+.ev.bad::before{border-color:var(--alert)}
+.ev.new{animation:evIn .6s var(--ease) both}
+.ev.new .evbody{animation:flash 1.8s ease .2s both}
+@keyframes evIn{from{opacity:0;transform:translateY(-10px)}}
+@keyframes flash{0%{background:var(--marigold-soft)}100%{background:var(--paper)}}
+.evtime{font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink-2)}
+.evbody{background:var(--paper);border-radius:var(--r-md);padding:12px;margin-top:4px}
+.evbody h4{margin:0;font-size:15px}
+.evbody p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+.photo{margin-top:10px;border-radius:var(--r-sm);overflow:hidden;display:block;width:100%;height:auto}
+.readings{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.reading{background:var(--leaf-faint);border-radius:var(--r-sm);padding:8px 10px}
+.reading b{font-family:var(--display);font-size:20px;font-weight:600}
+.reading span{display:block;font-size:12px;color:var(--ink-3)}
+.daylabel{font-family:var(--display);font-weight:600;font-size:15px;margin:14px 0 8px}
+.lock{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-3);margin-top:8px}
+
+/* stepper */
+.steps{list-style:none;margin:0;padding:0}
+.step{display:grid;grid-template-columns:28px 1fr;gap:12px;position:relative;padding-bottom:18px}
+.step:not(:last-child)::after{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--line)}
+.step.done:not(:last-child)::after{background:var(--leaf)}
+.sdot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--line-2);color:var(--ink-3);border:2px solid var(--line)}
+.step.done .sdot{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.step.bad .sdot{background:var(--alert);border-color:var(--alert);color:#fff}
+.step.now .sdot{border-color:var(--marigold);background:var(--marigold-soft);color:var(--marigold-deep)}
+.step.now .sdot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--marigold);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.step h4{margin:3px 0 0;font-size:15px}
+.step p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+
+/* caregiver app */
+.cg-hero{background:var(--marigold-soft);border-radius:var(--r-lg);padding:16px}
+.addr{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding-top:12px;border-top:1px solid rgba(154,91,5,.2)}
+.map{position:relative;height:210px;border-radius:var(--r-lg);overflow:hidden;background:#E4EAE5}
+.map svg.streets{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);color:var(--leaf);z-index:2}
+.pin svg{width:34px;height:34px}
+.pulse{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:rgba(31,77,59,.25)}
+.locating .pulse{animation:locp 1.4s ease-out infinite}
+.locating .pulse.p2{animation-delay:.7s}
+@keyframes locp{from{transform:scale(.4);opacity:1}to{transform:scale(6);opacity:0}}
+.locstate{position:absolute;left:12px;bottom:12px;right:12px;background:var(--paper);border-radius:var(--r-md);padding:10px 12px;font-size:14px;display:flex;gap:8px;align-items:center;z-index:3}
+.camera{position:relative;border-radius:var(--r-lg);overflow:hidden;background:#24302C;aspect-ratio:4/3;display:grid;place-items:center}
+.camera .frame{position:absolute;inset:18px;border:2px solid rgba(255,255,255,.5);border-radius:14px}
+.shutter{width:62px;height:62px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.2);position:absolute;bottom:14px;left:50%;transform:translateX(-50%)}
+.shutter:active{background:#fff}
+.flashlayer{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flashlayer.go{animation:camflash .5s ease}
+@keyframes camflash{10%{opacity:.95}100%{opacity:0}}
+.task{display:flex;gap:12px;align-items:center}
+.vitals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.vitals .field{text-align:center;font-family:var(--display);font-weight:600;font-size:18px;padding:10px 6px}
+
+/* elder */
+.elder{background:var(--paper)}
+.elder .scroll{display:flex;flex-direction:column;padding-top:60px}
+.elder-today{text-align:center}
+.elder-today h2{font-family:var(--display);font-weight:600;font-size:30px;letter-spacing:-.02em;margin:12px 0 2px;line-height:1.1}
+.elder-today p{font-size:20px;margin:0;color:var(--ink-2)}
+.sos-wrap{margin:auto 0 10px;display:grid;place-items:center;gap:12px;padding-top:26px}
+.sos{position:relative;width:210px;height:210px;border-radius:50%;border:0;background:var(--alert);color:#fff;font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.02em;touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .15s}
+.sos.holding{transform:scale(.96)}
+.sos small{display:block;font-family:var(--body);font-weight:700;font-size:16px;letter-spacing:0;opacity:.95}
+.sos svg.hold{position:absolute;inset:-14px;width:238px;height:238px;transform:rotate(-90deg)}
+.sos svg.hold circle{fill:none;stroke:var(--alert);stroke-width:8;stroke-linecap:round;stroke-dasharray:691;stroke-dashoffset:691}
+.callbtn{font-size:19px;padding:16px}
+.sent-wave{width:150px;height:150px;margin:40px auto 0;position:relative;display:grid;place-items:center}
+.sent-wave i{position:absolute;inset:0;border-radius:50%;border:3px solid var(--leaf);opacity:0;animation:wave 2.4s ease-out infinite}
+.sent-wave i:nth-child(2){animation-delay:.8s}.sent-wave i:nth-child(3){animation-delay:1.6s}
+@keyframes wave{from{transform:scale(.5);opacity:.9}to{transform:scale(1.25);opacity:0}}
+.sent-wave span{width:96px;height:96px;border-radius:50%;background:var(--leaf);color:#fff;display:grid;place-items:center}
+.sent-wave svg{width:44px;height:44px}
+
+/* coordinator + admin */
+.qitem{background:var(--paper);border-radius:var(--r-lg);padding:14px;border-left:0;display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:1.5px solid transparent}
+.qitem.bad{border-color:#E8B4AA}
+.qitem .sev{width:10px;height:10px;border-radius:50%;background:var(--alert);margin-top:6px;flex:none}
+.qitem .sev.amber{background:var(--marigold)}
+.qitem .sev.done{background:var(--leaf)}
+.timer{font-family:var(--display);font-weight:600;font-size:13px;color:var(--alert);white-space:nowrap}
+.toggle{width:46px;height:28px;border-radius:999px;background:#C8D0CB;border:0;position:relative;transition:background .25s;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .25s var(--ease);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle[aria-checked="true"]{background:var(--leaf)}
+.toggle[aria-checked="true"]::after{transform:translateX(18px)}
+.kpi{background:var(--paper);border-radius:var(--r-lg);padding:14px}
+.kpi h4{margin:0;font-size:14px;color:var(--ink-2);font-weight:700}
+.kpi .val{font-family:var(--display);font-weight:600;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-top:6px}
+.kpi .val small{font-size:15px;color:var(--ink-3);font-weight:500}
+.kbar{height:8px;border-radius:5px;background:var(--line-2);position:relative;margin-top:10px}
+.kbar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--leaf);width:0;transition:width 1s var(--ease)}
+.kbar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.kfoot{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-3);margin-top:6px}
+.spark{width:100%;height:46px;margin-top:8px}
+.spark path.l{fill:none;stroke:var(--leaf);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400;animation:sparkdraw 1.2s .2s var(--ease) forwards}
+.spark path.a{fill:var(--leaf-soft);opacity:0;animation:fadeIn .6s .9s forwards}
+.spark line{stroke:var(--marigold);stroke-width:1.5;stroke-dasharray:4 3}
+@keyframes sparkdraw{to{stroke-dashoffset:0}}
+.stars{display:flex;gap:6px;justify-content:center}
+.star{background:none;border:0;padding:4px;color:#C7CFCA;transition:transform .15s,color .15s}
+.star svg{width:36px;height:36px}
+.star.on{color:var(--marigold)}
+.star:active{transform:scale(1.2)}
+.soon{display:flex;gap:12px;align-items:center;background:var(--paper);border-radius:var(--r-lg);padding:14px}
+.soon .qi{width:44px;height:44px;border-radius:13px;background:var(--line-2);color:var(--ink-3);display:grid;place-items:center}
+.soontag{margin-left:auto;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--marigold-soft);color:var(--marigold-deep);white-space:nowrap}
+.delete-list{list-style:none;padding:0;margin:0}
+.delete-list li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line-2);font-size:14.5px}
+.delete-list li:first-child{border-top:0}
+.delete-list .ic-sm{margin-top:3px;color:var(--alert)}
+
+/* toast */
+.toast{position:absolute;left:14px;right:14px;top:54px;z-index:40;background:var(--ink);color:#fff;border-radius:var(--r-md);padding:12px 14px;display:flex;gap:10px;align-items:center;font-size:14.5px;transform:translateY(-220px);transition:transform .45s var(--ease);pointer-events:none}
+.toast.show{transform:none}
+.toast .ic{color:var(--marigold)}
+
+/* install hint */
+.install{display:flex;gap:10px;align-items:center;background:var(--paper);border-radius:var(--r-md);padding:10px 12px;font-size:13.5px;color:var(--ink-2)}
+
+@media (max-width:1180px){
+  .stage{grid-template-columns:minmax(260px,320px) auto;gap:40px}
+  .right{grid-column:1 / -1;position:static;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .req-now{margin:0}
+}
+@media (max-width:780px){
+  .stage{grid-template-columns:1fr;padding-block:20px 40px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));gap:28px}
+  .side{position:static}
+  .left{order:1}.phone-col{order:2}.right{order:3;grid-template-columns:1fr}
+  .phone{transform-origin:top center}
+}
+@media (max-width:430px){
+  .phone{width:100%;height:760px;border-radius:44px;padding:8px}
+  .screenwrap{border-radius:36px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-tl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M11 6h9M11 18h9M11 12h6"/></g></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></g></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5 19 6v5.5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></g></symbol>
+    <symbol id="i-pinfill" viewBox="0 0 24 24"><path d="M12 22s-7-6-7-11.8a7 7 0 0 1 14 0C19 16 12 22 12 22z" fill="currentColor"/><circle cx="12" cy="10" r="2.8" fill="#fff"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l1.6-2.5h6.8L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></g></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></g></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.6 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 17l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5h2.6l1.4 4-2 1.3a11 11 0 0 0 6.6 6.6l1.3-2 4 1.4v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.2" y="8.5" width="17.6" height="7" rx="3.5" transform="rotate(-40 12 12)"/><path d="m9.3 9.4 5.3 5.3" transform="rotate(5 12 12)"/></g></symbol>
+    <symbol id="i-bowl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M9 7.5c0-1.2 1-1.2 1-2.5M13.5 7.5c0-1.2 1-1.2 1-2.5"/></g></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="m10 21 2-6.5 3 3V21M8 11l3-3.5 3 2 2.5 2.5M12 14.5l-1-4"/></g></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.4 4.4 0 0 1 12 7.4 4.4 4.4 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.2a4.5 4.5 0 0 1 5 4.3"/></g></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"/><path d="M7 16v-4M12 16V7M17 16v-7"/></g></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2 11h10.5l2-8H7"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></g></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></g></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></g></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></g></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-escal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V9l7-5 7 5v11"/><path d="M12 16v-6M9 12.5l3-3 3 3"/></g></symbol>
+  </defs>
+</svg>
+
+<main class="stage">
+  <!-- LEFT: controls -->
+  <aside class="side left" aria-label="Prototype controls">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="12" fill="#1F4D3B"/>
+        <path d="M20 29.5s-8.5-5-8.5-11.2A4.9 4.9 0 0 1 20 15.4a4.9 4.9 0 0 1 8.5 2.9c0 6.2-8.5 11.2-8.5 11.2z" fill="#E39A2D"/>
+        <path d="M16.5 20.3l2.5 2.5 4.6-4.6" fill="none" stroke="#1F4D3B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>KinCare</h1>
+    </div>
+    <p class="intro">A clickable prototype of the app in our requirements document. Switch between the five people who use it, or follow the key moments in order.</p>
+    <p class="credit">IT for Managers Capstone, Section 4, Group 5 (TCS)</p>
+
+    <h2>View the app as</h2>
+    <div class="roles" role="group" aria-label="Choose a user">
+      <button class="role-btn" data-role="f" aria-pressed="true"><span class="av sm">MI</span><span><span class="role-name">Family</span><br><span class="role-sub">Meera, Singapore</span></span></button>
+      <button class="role-btn" data-role="c" aria-pressed="false"><span class="av sm leaf">LR</span><span><span class="role-name">Caregiver</span><br><span class="role-sub">Lakshmi R.</span></span></button>
+      <button class="role-btn" data-role="e" aria-pressed="false"><span class="av sm">KI</span><span><span class="role-name">Elder</span><br><span class="role-sub">Kamala, Chennai</span></span></button>
+      <button class="role-btn" data-role="k" aria-pressed="false"><span class="av sm leaf">RK</span><span><span class="role-name">Coordinator</span><br><span class="role-sub">Ravi Kumar</span></span></button>
+      <button class="role-btn" data-role="a" aria-pressed="false" style="grid-column:1/-1"><span class="av sm leaf">NR</span><span><span class="role-name">Care Operations head</span><br><span class="role-sub">Nandini Rao, admin</span></span></button>
+    </div>
+
+    <h2>Key moments, in order</h2>
+    <ol class="moments" id="moments">
+      <li><button class="moment" data-m="parent"><span>Add a parent and record consent<small>Family</small></span></button></li>
+      <li><button class="moment" data-m="book"><span>Book a verified caregiver for 14 days<small>Family</small></span></button></li>
+      <li><button class="moment" data-m="checkin"><span>Check in with location and photo<small>Caregiver</small></span></button></li>
+      <li><button class="moment" data-m="timeline"><span>See the visit on the timeline<small>Family</small></span></button></li>
+      <li><button class="moment" data-m="miss"><span>Miss a shift: no check-in by 8:30<small>Family and coordinator</small></span></button></li>
+      <li><button class="moment" data-m="assign"><span>Assign a replacement<small>Coordinator</small></span></button></li>
+      <li><button class="moment" data-m="escalate"><span>Replacement also misses: escalate<small>Care Operations head</small></span></button></li>
+      <li><button class="moment" data-m="verify"><span>Verify a new caregiver<small>Coordinator</small></span></button></li>
+      <li><button class="moment" data-m="sos"><span>Press SOS<small>Elder</small></span></button></li>
+      <li><button class="moment" data-m="renew"><span>Rate and renew at block end<small>Family</small></span></button></li>
+      <li><button class="moment" data-m="kpi"><span>Check the four KPIs<small>Care Operations head</small></span></button></li>
+      <li><button class="moment" data-m="close"><span>Close the account and delete data<small>Family</small></span></button></li>
+    </ol>
+    <button class="reset" id="reset">Start the demo again</button>
+  </aside>
+
+  <!-- CENTER: phone -->
+  <div class="phone-col">
+    <div class="phone" id="phone">
+      <div class="screenwrap">
+        <div class="notch" aria-hidden="true"></div>
+        <div class="statusbar" id="statusbar" aria-hidden="true">
+          <span id="clock">7:52</span>
+          <span class="sb-icons">
+            <svg viewBox="0 0 24 24"><path d="M3 18h2v-3H3zm4 0h2v-6H7zm4 0h2V9h-2zm4 0h2V6h-2z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="17" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4.5" y="9" width="11" height="6" rx="1.2" fill="currentColor"/><rect x="20.5" y="10" width="1.6" height="4" rx=".8" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"><svg class="ic"><use href="#i-check"/></svg><span id="toast-text"></span></div>
+        <div class="viewport" id="viewport"></div>
+      </div>
+    </div>
+    <p class="phone-caption" id="caption"></p>
+  </div>
+
+  <!-- RIGHT: requirements -->
+  <aside class="side right" aria-label="Requirements shown">
+    <section class="req-now" aria-live="polite">
+      <h2>What this screen shows</h2>
+      <p class="req-screen" id="req-screen"></p>
+      <div id="req-list"></div>
+    </section>
+    <section class="cover">
+      <h2>Covered so far<span id="cover-count"></span></h2>
+      <div class="cover-bar"><i id="cover-bar"></i></div>
+      <div class="cover-grid" id="cover-grid"></div>
+      <p class="legend">Green: functional requirements. Amber: business rules. Blue: data and privacy. A chip fills in once you have seen it working.</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+/* ======================= requirements from the BRD ======================= */
+const REQ = {
+  FR1:{t:'fr',d:'The family creates a parent profile and records consent on the parent’s behalf.'},
+  FR2:{t:'fr',d:'The family browses verified caregivers in the parent’s pin code and books a 12- or 24-hour shift for a 14-day block.'},
+  FR3:{t:'fr',d:'The caregiver checks in and out with location and a photo, ticks tasks and enters BP and sugar.'},
+  FR4:{t:'fr',d:'The family sees a daily timeline of each visit: times, photo, tasks done and readings.'},
+  FR5:{t:'fr',d:'The app alerts the family and coordinator when there is no check-in 30 minutes after shift start, or when the elder taps SOS.'},
+  FR6:{t:'fr',d:'The coordinator sees open alerts and assigns a replacement caregiver.'},
+  FR7:{t:'fr',d:'The coordinator adds a caregiver and marks ID, police check and training as complete.'},
+  FR8:{t:'fr',d:'Nice to have: the family rates the caregiver and renews or ends the booking at the end of a block.'},
+  FR9:{t:'fr',d:'Nice to have: the Care Operations head sees the four KPIs on one screen.'},
+  BR1:{t:'br',d:'A booking is a minimum 14-day block of 12- or 24-hour shifts at one address.'},
+  BR2:{t:'br',d:'A caregiver is shown to families only after all three checks are complete.'},
+  BR3:{t:'br',d:'No check-in within 30 minutes marks the shift missed, alerts the family and coordinator and opens a replacement request, to be filled within 4 hours.'},
+  BR4:{t:'br',d:'Health readings are visible only to the family, the coordinator and the caregiver on that shift; a caregiver sees an address only for a current shift.'},
+  BR5:{t:'br',d:'If a replacement also fails to check in within 30 minutes, the alert escalates to the Care Operations head.'},
+  CONSENT:{t:'dp',d:'Health data is collected only after the family records consent.'},
+  DELETE:{t:'dp',d:'When a family closes its account, the parent’s profile, readings and photos are deleted.'},
+  SCOPE:{t:'dp',d:'Out of scope for version 1: add-on services such as medicine and grocery delivery appear as coming soon; payments are a mock checkout.'}
+};
+const REQ_ORDER = Object.keys(REQ);
+const label = k => ({CONSENT:'Consent',DELETE:'Deletion',SCOPE:'Scope'}[k]||k);
+
+/* ======================= demo state ======================= */
+const fresh = () => ({
+  clock:'7:52',
+  parentAdded:false, consent:false,
+  booking:null,                // new booking from the flow
+  draft:{shift:12, start:'4 Nov', cg:null},
+  checkedIn:false, checkInTime:null, photo:false, located:false,
+  tasks:{meds:false,breakfast:false,walk:false,lunch:false},
+  bp:null, sugar:null, checkedOut:false,
+  missed:false, replacement:null, replacementMissed:false, escalated:false, escalationHandled:false,
+  sos:false, sosAck:false,
+  newCg:{name:'Anitha K.', id:true, police:false, training:true},
+  rated:0, renewed:null,
+  closed:false,
+  seen:new Set(), moments:new Set(),
+  fresh:{}
+});
+let S = fresh();
+const CAREGIVERS = [
+  {k:'lakshmi',n:'Lakshmi R.',i:'LR',yrs:6,lang:'Tamil, English',r12:1100,r24:1800,stars:4.8,visits:212},
+  {k:'selvi',n:'Selvi M.',i:'SM',yrs:4,lang:'Tamil, Telugu',r12:1000,r24:1700,stars:4.7,visits:138},
+  {k:'priya',n:'Priya D.',i:'PD',yrs:8,lang:'Tamil, Hindi, English',r12:1200,r24:1900,stars:4.9,visits:301}
+];
+const cgBy = k => CAREGIVERS.find(c=>c.k===k);
+const inr = n => '₹' + n.toLocaleString('en-IN');
+
+/* ======================= helpers ======================= */
+const $ = s => document.querySelector(s);
+const ic = (id,cls='ic') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const back = (to,title,extra='') => `<div class="appbar"><button class="iconbtn" data-go="${to}" data-dir="back" aria-label="Back">${ic('back')}</button><h2>${title}</h2>${extra}</div>`;
+const bar = (title,extra='') => `<div class="appbar" style="margin-left:0"><h2>${title}</h2>${extra}</div>`;
+const vb = (ok,txt) => `<span class="vbadge ${ok?'':'no'}">${ic(ok?'check':'clock')}${txt}</span>`;
+const badges = (a=[1,1,1]) => `<div class="badges">${vb(a[0],'ID')}${vb(a[1],'Police check')}${vb(a[2],'Training')}</div>`;
+function toast(msg){const t=$('#toast');$('#toast-text').textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600)}
+function setClock(t){S.clock=t;$('#clock').textContent=t}
+function cover(...keys){keys.forEach(k=>{if(!S.seen.has(k)){S.seen.add(k);const el=document.querySelector(`.chip-cov[data-k="${k}"]`);if(el){el.classList.add('on','pop');setTimeout(()=>el.classList.remove('pop'),600)}}});updateCover()}
+function updateCover(){const n=S.seen.size,t=REQ_ORDER.length;$('#cover-count').textContent=`${n} of ${t}`;$('#cover-bar').style.width=(n/t*100)+'%'}
+function moment(m){S.moments.add(m);const b=document.querySelector(`.moment[data-m="${m}"]`);if(b)b.classList.add('done')}
+const tasksDone = () => Object.values(S.tasks).filter(Boolean).length;
+const parentStatus = () => {
+  if(S.escalated && !S.escalationHandled) return {cls:'bad',txt:'Replacement missed too. Escalated to Care Operations'};
+  if(S.sos && !S.sosAck) return {cls:'bad',txt:'Amma pressed SOS at '+S.sosTime};
+  if(S.missed && !S.replacement) return {cls:'bad',txt:'Lakshmi has not checked in. Finding a replacement'};
+  if(S.missed && S.replacement) return {cls:'',txt:`${S.replacement} is on the way, arriving by 11:15`};
+  if(S.checkedOut) return {cls:'ok',txt:'Visit complete. Lakshmi checked out at 8:04 pm'};
+  if(S.checkedIn) return {cls:'ok',txt:`Lakshmi checked in at ${S.checkInTime}`};
+  return {cls:'',txt:'Lakshmi is due at 8:00 am'};
+};
+
+/* ======================= screens ======================= */
+const SCREENS = {};
+const META = {}; // screen -> {role, name, req:[], caption}
+function def(id,role,name,req,fn,opts={}){SCREENS[id]=fn;META[id]={role,name,req,...opts}}
+
+/* ---------- FAMILY ---------- */
+function tabbar(cur){
+  const alerts = (S.missed&&!S.replacement)||(S.sos&&!S.sosAck)||(S.escalated&&!S.escalationHandled);
+  const t=(id,icn,txt,dot)=>`<button class="tab" data-go="${id}" data-dir="fade" ${cur===id?'aria-current="page"':''}>${ic(icn)}${txt}${dot?'<span class="dot"></span>':''}</button>`;
+  return `<nav class="tabbar" aria-label="Family app">${t('f-home','home','Home',alerts)}${t('f-timeline','tl','Timeline')}${t('f-book','cal','Book care')}${t('f-services','grid','Services')}</nav>`;
+}
+def('f-home','f','Family home',['FR4','FR5'],()=>{
+  const st=parentStatus(); const done=tasksDone(); const C=2*Math.PI*24;
+  let alertBanner='';
+  if(S.escalated && !S.escalationHandled) alertBanner=`<button class="banner" data-go="f-alert">${ic('warn')}<span><b>The replacement has not arrived either</b><span>Nandini Rao, Care Operations head, is handling this now. Also sent to your email.</span></span></button>`;
+  else if(S.sos && !S.sosAck) alertBanner=`<button class="banner" data-go="f-alert">${ic('warn')}<span><b>Amma pressed SOS at ${S.sosTime}</b><span>Ravi from KinCare is calling her now. Also sent to your email.</span></span></button>`;
+  else if(S.missed && !S.replacement) alertBanner=`<button class="banner" data-go="f-alert">${ic('warn')}<span><b>No check-in by 8:30</b><span>Lakshmi has not arrived. We are assigning a verified replacement. Also sent to your email.</span></span></button>`;
+  else if(S.missed && S.replacement) alertBanner=`<button class="banner calm" data-go="f-alert">${ic('clock')}<span><b>Replacement on the way</b><span>${S.replacement} arrives by 11:15, inside the 4-hour promise.</span></span></button>`;
+  const ring = `<svg class="ring" viewBox="0 0 58 58" aria-label="${done} of 4 tasks done"><circle class="bg" cx="29" cy="29" r="24"/><circle class="fg" cx="29" cy="29" r="24" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-done/4)}"/><text x="29" y="34" text-anchor="middle">${done}/4</text></svg>`;
+  const days = Array.from({length:14},(_,i)=>`<i class="${i<9?'done':i===9?'today':''}"></i>`).join('');
+  return `<div class="scroll"><div class="stack">
+    <div class="row between"><div><p class="muted small" style="margin:6px 0 0">Friday, 30 October</p><p class="hello">Good morning, Meera</p></div><button class="iconbtn" data-go="f-account" aria-label="Account and privacy">${ic('gear')}</button></div>
+    ${alertBanner}
+    <div class="parent-card">
+      <div class="row"><span class="av lg">KI</span><div><b style="font-size:18px">Amma (Kamala Iyer)</b><div class="muted small">78, Adyar, Chennai 600020</div></div></div>
+      <div class="status-line"><span class="live ${st.cls}"></span><span>${st.txt}</span></div>
+      <div class="ringwrap" style="margin-top:14px">${ring}<div><b>Today's care plan</b><div class="muted small">Medicines, breakfast, short walk, lunch</div></div></div>
+    </div>
+    <div class="surface">
+      <div class="row between"><b>Current care block</b><span class="tiny">Day 10 of 14</span></div>
+      <div class="plan" style="margin-top:8px"><span class="av sm leaf">LR</span><div class="small"><b>Lakshmi R.</b>, 12-hour day shift<br><span class="muted">21 Oct to 3 Nov</span></div></div>
+      <div class="daystrip" aria-hidden="true">${days}</div>
+      <button class="linkbtn" data-go="f-renew" style="margin-top:8px">Block ends Tuesday. Rate and renew</button>
+    </div>
+    <div class="quick">
+      <button class="qa" data-go="f-timeline"><span class="qi">${ic('tl')}</span><b>Today's visit<small>Check-ins, photos, readings</small></b></button>
+      <button class="qa" data-go="f-book"><span class="qi">${ic('cal')}</span><b>Book care<small>Verified caregivers near Amma</small></b></button>
+      <button class="qa" data-go="f-parent"><span class="qi">${ic('plus')}</span><b>Add a parent<small>${S.parentAdded?'Appa added':'Profile and consent'}</small></b></button>
+      <button class="qa" data-go="f-services"><span class="qi">${ic('grid')}</span><b>Services<small>Medicine, groceries</small></b></button>
+    </div>
+    <div class="install">${ic('up','ic-sm')}<span>Add KinCare to your home screen: tap Share, then Add to Home Screen.</span></div>
+  </div></div>${tabbar('f-home')}`;
+},{caption:'Meera checks on her mother from Singapore.'});
+
+def('f-parent','f','Add a parent',['FR1','CONSENT'],()=>{
+  const needs=['Medicines','Mobility help','Meals','Bathing','Companionship'];
+  return `<div class="scroll">${back('f-home','Add a parent')}
+  <form class="stack" id="parent-form" onsubmit="return false">
+    <div><label class="label" for="p-name">Name</label><input class="field" id="p-name" value="Venkat Iyer"></div>
+    <div class="row" style="gap:10px"><div style="flex:1"><label class="label" for="p-age">Age</label><input class="field" id="p-age" value="81" inputmode="numeric"></div><div style="flex:1.4"><label class="label" for="p-pin">Pin code</label><input class="field" id="p-pin" value="600020" inputmode="numeric"></div></div>
+    <div><label class="label" for="p-addr">Address</label><input class="field" id="p-addr" value="14, 3rd Main Road, Gandhi Nagar, Adyar"></div>
+    <div><span class="label">Care needs</span><div class="pillset">${needs.map((n,i)=>`<button type="button" class="pill" aria-pressed="${i<2}" data-toggle-pill>${n}</button>`).join('')}</div></div>
+    <div><label class="label" for="p-ec">Emergency contact</label><input class="field" id="p-ec" value="Mrs. Rao (neighbour), 98410 22xxx"></div>
+    <div class="checkrow ${S.consent?'on':''}" role="checkbox" tabindex="0" aria-checked="${S.consent}" data-act="consent"><span class="box">${ic('check')}</span><span class="small">I consent, on my parent's behalf, to KinCare storing these details and the health readings recorded during visits, for arranging and checking their care.</span></div>
+    <p class="note">${ic('lock','ic-sm')}<span>Only you, your coordinator and the caregiver on shift can see health readings.</span></p>
+    <button class="btn" data-act="save-parent" ${S.consent?'':'disabled'}>Save profile</button>
+    ${S.consent?'':'<p class="tiny center" style="margin:0">Tick the consent box to save.</p>'}
+  </form></div>`;
+},{caption:'Saving is blocked until consent is ticked (FR1).'});
+
+def('f-book','f','Book care: shift and dates',['FR2','BR1'],()=>{
+  const d=S.draft;
+  return `<div class="scroll">${back('f-home','Book care')}
+  <div class="stack">
+    <div class="surface"><span class="label">For</span><div class="row"><span class="av sm">KI</span><div><b>Amma (Kamala Iyer)</b><div class="tiny">Adyar, Chennai 600020</div></div></div></div>
+    <div><span class="label">Shift length</span><div class="seg" role="group" aria-label="Shift length"><button data-shift="12" aria-pressed="${d.shift===12}">12 hours, day</button><button data-shift="24" aria-pressed="${d.shift===24}">24 hours</button></div></div>
+    <div><label class="label" for="b-start">Start date</label><select class="field" id="b-start"><option>4 Nov, Wednesday</option><option>5 Nov, Thursday</option><option>6 Nov, Friday</option></select></div>
+    <div class="surface">
+      <div class="row between"><span class="label" style="margin:0">Length of booking</span><span class="tag br">BR1</span></div>
+      <div class="row between" style="margin-top:10px"><button class="iconbtn" data-act="minus" aria-label="Fewer days" style="background:var(--line-2)">−</button><div class="center"><span style="font-family:var(--display);font-weight:600;font-size:28px">14</span><div class="tiny">days, minimum</div></div><button class="iconbtn" aria-label="More days" style="background:var(--line-2)" data-act="plus">+</button></div>
+      <p class="tiny center" id="min-msg" style="margin:8px 0 0;min-height:18px"></p>
+    </div>
+    <button class="btn" data-go="f-book-list">See verified caregivers near Amma</button>
+  </div></div>`;
+},{caption:'Bookings are a minimum 14-day block (BR1).'});
+
+def('f-book-list','f','Verified caregivers',['FR2','BR2'],()=>{
+  const d=S.draft;
+  return `<div class="scroll">${back('f-book','Caregivers in 600020')}
+  <div class="stack">
+    <p class="small muted" style="margin:0">${CAREGIVERS.length} verified caregivers for a ${d.shift}-hour shift from ${d.start}.</p>
+    ${CAREGIVERS.map(c=>`<button class="cg" data-pick="${c.k}"><span class="av ${c.k==='lakshmi'?'leaf':''}">${c.i}</span><span style="flex:1"><span class="row between"><h3>${c.n}</h3><span class="rate">${inr(d.shift===12?c.r12:c.r24)}<span class="tiny">/day</span></span></span><span class="meta">${c.yrs} years, ${c.lang}</span><span class="row" style="gap:6px;font-size:13px;color:var(--ink-2);margin-bottom:8px">${ic('star','ic-sm')}<span>${c.stars} from ${c.visits} visits</span></span>${badges()}</span></button>`).join('')}
+    <div class="hidden-note">${ic('lock','ic-sm')}<span>Caregivers still waiting on a check are not listed. Every person here has a verified ID, police check and training.</span></div>
+  </div></div>`;
+},{caption:'Only fully verified caregivers appear (BR2).'});
+
+def('f-cg','f','Caregiver profile',['FR2','BR2'],()=>{
+  const c=cgBy(S.draft.cg)||CAREGIVERS[0]; const d=S.draft; const rate=d.shift===12?c.r12:c.r24;
+  return `<div class="scroll">${back('f-book-list',c.n)}
+  <div class="stack">
+    <div class="surface center"><span class="av xl" style="margin:4px auto 10px">${c.i}</span><b style="font-size:19px">${c.n}</b><div class="muted small">${c.yrs} years of home care, ${c.lang}</div><div style="display:flex;justify-content:center;margin-top:12px">${badges()}</div></div>
+    <div class="surface"><b>Verification</b>
+      <div class="kv"><span>ID document</span><span>Checked 12 Aug</span></div>
+      <div class="kv"><span>Police verification</span><span>Cleared 19 Aug</span></div>
+      <div class="kv"><span>Elder-care training</span><span>Completed 2 Sep</span></div>
+    </div>
+    <div class="surface"><div class="kv"><span>${d.shift}-hour shift</span><span>${inr(rate)} per day</span></div><div class="kv"><span>Starts</span><span>${d.start}</span></div></div>
+    <button class="btn" data-go="f-pay">Continue to checkout</button>
+  </div></div>`;
+});
+
+def('f-pay','f','Checkout',['FR2','BR1','SCOPE'],()=>{
+  const c=cgBy(S.draft.cg)||CAREGIVERS[0]; const d=S.draft; const rate=d.shift===12?c.r12:c.r24; const care=rate*14;
+  return `<div class="scroll">${back('f-cg','Checkout')}
+  <div class="stack">
+    <div class="surface"><div class="row"><span class="av sm">${c.i}</span><div><b>${c.n}</b><div class="tiny">${d.shift}-hour shift, 14 days from ${d.start}</div></div></div>
+      <div class="divider" style="margin:12px 0 4px"></div>
+      <div class="kv"><span>Care, 14 × ${inr(rate)}</span><span>${inr(care)}</span></div>
+      <div class="kv"><span>KinCare membership, 1 month</span><span>${inr(1999)}</span></div>
+      <div class="kv tiny" style="padding-top:0"><span>Verification, alerts and backup cover</span><span></span></div>
+      <div class="kv total"><span>Total</span><span>${inr(care+1999)}</span></div>
+    </div>
+    <p class="note">${ic('lock','ic-sm')}<span>Prototype checkout. No payment is taken.</span></p>
+    <button class="btn" data-act="confirm-booking">Confirm booking</button>
+  </div></div>`;
+},{caption:'Mock checkout only; real payments are out of scope.'});
+
+def('f-done','f','Booking confirmed',['FR2'],()=>{
+  const c=cgBy(S.draft.cg)||CAREGIVERS[0];
+  return `<div class="scroll" style="display:flex;flex-direction:column"><div class="center">
+    <svg class="check-anim" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="48"/><path d="M30 49l12 12 24-26"/></svg>
+    <p class="bigtitle">Booking confirmed</p>
+    <p class="muted" style="max-width:28ch;margin:0 auto">${c.n} will care for Amma for 14 days from ${S.draft.start}. You will see every visit on the timeline.</p></div>
+    <div class="surface stack" style="margin-top:22px">
+      <div class="kv"><span>Shifts created</span><span>14</span></div>
+      <div class="kv"><span>Check-in window</span><span>8:00 to 8:30 am</span></div>
+      <div class="kv"><span>If no check-in by 8:30</span><span>You are alerted</span></div>
+    </div>
+    <div style="margin-top:auto;padding-top:18px"><button class="btn" data-go="f-home" data-dir="back">Back to home</button></div>
+  </div>`;
+});
+
+def('f-timeline','f','Visit timeline',['FR4','BR4'],()=>{
+  const ev=[];
+  const n = k => S.fresh[k] ? ' new' : '';
+  if(S.checkedIn){
+    ev.push(`<div class="ev${n('in')}"><span class="evtime">${S.checkInTime} am</span><div class="evbody"><h4>Lakshmi checked in</h4><p>${ic('pin','ic-sm')} At Amma's home, Adyar (within 20 m)</p>${photoSVG(S.checkInTime)}</div></div>`);
+  }
+  const tl=[['meds','pill','Morning medicines given','Amlodipine 5 mg, Metformin 500 mg'],['breakfast','bowl','Breakfast','Idli and sambar, ate well'],['walk','walk','Short walk','15 minutes in the colony'],['lunch','bowl','Lunch','Rice, rasam, beans poriyal']];
+  tl.forEach(([k,icn,t,s])=>{ if(S.tasks[k]) ev.push(`<div class="ev${n(k)}"><span class="evtime">${S.taskTimes?.[k]||''}</span><div class="evbody"><h4 class="row" style="gap:8px">${ic(icn,'ic-sm')}${t}</h4><p>${s}</p></div></div>`);});
+  if(S.bp) ev.push(`<div class="ev${n('vitals')}"><span class="evtime">${S.vitalsTime}</span><div class="evbody"><h4 class="row" style="gap:8px">${ic('heart','ic-sm')}Readings</h4><div class="readings"><div class="reading"><b>${S.bp}</b><span>BP, mmHg</span></div><div class="reading"><b>${S.sugar}</b><span>Sugar, mg/dL</span></div></div><p class="lock">${ic('lock','ic-sm')}Visible to you, Ravi (coordinator) and Lakshmi on shift</p></div></div>`);
+  if(S.checkedOut) ev.push(`<div class="ev${n('out')}"><span class="evtime">8:04 pm</span><div class="evbody"><h4>Lakshmi checked out</h4><p>12-hour shift complete. ${tasksDone()} of 4 tasks done.</p></div></div>`);
+  if(S.missed){
+    ev.push(`<div class="ev bad${n('miss')}"><span class="evtime">8:30 am</span><div class="evbody"><h4>No check-in</h4><p>Shift marked missed. You and Ravi were alerted.</p></div></div>`);
+    if(S.replacement) ev.push(`<div class="ev${n('rep')}"><span class="evtime">8:34 am</span><div class="evbody"><h4>${S.replacement} assigned</h4><p>Arriving by 11:15, within 4 hours.</p></div></div>`);
+  }
+  if(!S.checkedIn && !S.missed) ev.push(`<div class="ev pending"><span class="evtime">8:00 am</span><div class="evbody"><h4>Lakshmi is due</h4><p>Check-in opens at 8:00. You will be alerted if she has not checked in by 8:30.</p></div></div>`);
+  S.fresh={};
+  return `<div class="scroll">${bar('Amma’s visits')}
+    <div class="seg" role="group" aria-label="Day" style="margin-bottom:6px"><button aria-pressed="true">Today</button><button aria-pressed="false" data-act="noop">Earlier days</button></div>
+    <p class="daylabel">Friday, 30 October</p>
+    <div class="tl">${ev.join('')}</div>
+    <p class="daylabel">Thursday, 29 October</p>
+    <div class="tl">
+      <div class="ev"><span class="evtime">7:56 am</span><div class="evbody"><h4>Lakshmi checked in</h4><p>${ic('pin','ic-sm')} At Amma's home, Adyar</p></div></div>
+      <div class="ev"><span class="evtime">10:40 am</span><div class="evbody"><h4 class="row" style="gap:8px">${ic('heart','ic-sm')}Readings</h4><div class="readings"><div class="reading"><b>128/82</b><span>BP, mmHg</span></div><div class="reading"><b>142</b><span>Sugar, mg/dL</span></div></div></div></div>
+      <div class="ev"><span class="evtime">8:01 pm</span><div class="evbody"><h4>Lakshmi checked out</h4><p>4 of 4 tasks done.</p></div></div>
+    </div>
+  </div>${tabbar('f-timeline')}`;
+},{caption:'Every visit is recorded as proof of care (FR4).'});
+
+function photoSVG(t){return `<svg class="photo" viewBox="0 0 300 150" role="img" aria-label="Check-in photo at the front door, ${t} am"><rect width="300" height="150" fill="#D9CDB8"/><rect x="0" y="112" width="300" height="38" fill="#B8A88E"/><rect x="104" y="22" width="92" height="104" rx="3" fill="#7A4F2E"/><rect x="112" y="30" width="76" height="88" fill="#8C5D38"/><circle cx="178" cy="76" r="3.5" fill="#E3C27A"/><path d="M98 18h104v6H98z" fill="#E39A2D"/><g fill="#2C6650"><ellipse cx="62" cy="104" rx="20" ry="12"/><rect x="50" y="104" width="24" height="18" rx="3" fill="#9A5B05"/></g><g fill="#E39A2D"><circle cx="105" cy="22" r="5"/><circle cx="125" cy="24" r="5"/><circle cx="145" cy="25" r="5"/><circle cx="165" cy="24" r="5"/><circle cx="185" cy="22" r="5"/></g><rect x="200" y="122" width="92" height="20" rx="4" fill="rgba(28,38,35,.72)"/><text x="246" y="136" text-anchor="middle" font-family="Figtree,sans-serif" font-size="11" fill="#fff">${t} am, Adyar</text></svg>`}
+
+def('f-alert','f','Alert details',['FR5','FR6','BR3','BR5'],()=>{
+  if(S.sos && !S.missed){
+    return `<div class="scroll">${back('f-home','SOS from Amma')}
+    <ol class="steps">
+      <li class="step bad"><span class="sdot">${ic('warn','ic-sm')}</span><div><h4>Amma pressed SOS</h4><p>${S.sosTime} am, from her phone at home</p></div></li>
+      <li class="step done"><span class="sdot">${ic('check','ic-sm')}</span><div><h4>You and Ravi were alerted</h4><p>In the app and by email, so it reaches you in Singapore at any hour</p></div></li>
+      <li class="step ${S.sosAck?'done':'now'}"><span class="sdot">${S.sosAck?ic('check','ic-sm'):''}</span><div><h4>${S.sosAck?'Ravi spoke to Amma':'Ravi is calling Amma'}</h4><p>${S.sosAck?'She felt dizzy; Lakshmi is with her. Readings to follow.':'Coordinator, KinCare Chennai'}</p></div></li>
+    </ol>
+    <button class="btn ghost" data-act="call">${ic('phone','ic-sm')}Call Amma</button></div>`;
+  }
+  const r=S.replacement;
+  return `<div class="scroll">${back('f-home','Missed check-in')}
+  <ol class="steps">
+    <li class="step bad"><span class="sdot">${ic('x','ic-sm')}</span><div><h4>No check-in by 8:30</h4><p>Lakshmi R. was due at 8:00. Shift marked missed.</p></div></li>
+    <li class="step done"><span class="sdot">${ic('check','ic-sm')}</span><div><h4>You and Ravi were alerted</h4><p>8:30 am, in the app and by email</p></div></li>
+    <li class="step ${r?'done':'now'}"><span class="sdot">${r?ic('check','ic-sm'):''}</span><div><h4>${r?r+' assigned':'Assigning a verified replacement'}</h4><p>${r?'8:34 am by Ravi Kumar, coordinator':'Ravi is choosing from verified caregivers nearby'}</p></div></li>
+    ${S.replacementMissed?`<li class="step bad"><span class="sdot">${ic('x','ic-sm')}</span><div><h4>${r} did not check in either</h4><p>11:45 am, 30 minutes after the expected arrival</p></div></li>
+    <li class="step ${S.escalationHandled?'done':'now'}"><span class="sdot">${S.escalationHandled?ic('check','ic-sm'):''}</span><div><h4>${S.escalationHandled?'Priya D. confirmed by Nandini Rao':'Escalated to Nandini Rao'}</h4><p>${S.escalationHandled?'Care Operations head. Priya arrives by 12:30.':'Care Operations head is handling this personally'}</p></div></li>`:
+    `<li class="step ${r?'now':''}"><span class="sdot"></span><div><h4>Replacement arrives</h4><p>${r?'By 11:15 am, inside the 4-hour promise':'Within 4 hours of the alert'}</p></div></li>`}
+  </ol>
+  <div class="surface"><p class="small" style="margin:0">You do not need to call anyone. KinCare handles the replacement and keeps this page updated.</p></div></div>`;
+},{caption:'The family is told within 30 minutes and never arranges cover themselves.'});
+
+def('f-renew','f','Rate and renew',['FR8'],()=>{
+  return `<div class="scroll">${back('f-home','Block ends Tuesday')}
+  <div class="stack">
+    <div class="surface center"><span class="av lg leaf" style="margin:0 auto 8px">LR</span><b>How has Lakshmi been with Amma?</b>
+      <div class="stars" role="radiogroup" aria-label="Rating" style="margin-top:10px">${[1,2,3,4,5].map(i=>`<button class="star ${S.rated>=i?'on':''}" role="radio" aria-checked="${S.rated===i}" aria-label="${i} star${i>1?'s':''}" data-rate="${i}">${ic('star')}</button>`).join('')}</div>
+      <textarea class="field" style="margin-top:12px;min-height:70px;resize:none" aria-label="Comment">Very patient with Amma. Always on time.</textarea></div>
+    ${S.renewed?`<div class="surface center"><svg class="check-anim" viewBox="0 0 96 96" style="width:64px;height:64px;margin:4px auto" aria-hidden="true"><circle cx="48" cy="48" r="48"/><path d="M30 49l12 12 24-26"/></svg><b>${S.renewed==='renew'?'Renewed with Lakshmi, 4 to 17 Nov':'Booking will end on 3 Nov'}</b></div>`:
+    `<button class="btn" data-act="renew" ${S.rated?'':'disabled'}>Renew 14 days with Lakshmi</button><button class="btn ghost" data-act="end" ${S.rated?'':'disabled'}>End after this block</button>`}
+  </div></div>`;
+});
+
+def('f-services','f','Services',['SCOPE'],()=>{
+  const s=[['pill','Medicine delivery','From pharmacies near Amma'],['cart','Grocery delivery','Weekly essentials to her door']];
+  return `<div class="scroll">${bar('Services')}
+  <p class="muted small" style="margin:0 0 12px">More ways to look after Amma, coming after launch.</p>
+  <div class="stack">${s.map(([i,t,d])=>`<div class="soon"><span class="qi">${ic(i)}</span><div><b>${t}</b><div class="tiny">${d}</div></div><span class="soontag">Coming soon</span></div>`).join('')}</div>
+  </div>${tabbar('f-services')}`;
+},{caption:'Add-on services are shown but not built in version 1.'});
+
+def('f-account','f','Account and privacy',['DELETE','CONSENT','BR4'],()=>{
+  if(S.closed) return `<div class="scroll" style="display:flex;flex-direction:column;justify-content:center"><div class="center"><svg class="check-anim" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="48"/><path d="M30 49l12 12 24-26"/></svg><p class="bigtitle">Account closed</p><p class="muted" style="max-width:30ch;margin:0 auto 20px">Amma's profile, readings and check-in photos have been deleted. A confirmation is on its way to your email.</p><button class="btn ghost" data-act="restore">Restore the demo account</button></div></div>`;
+  return `<div class="scroll">${back('f-home','Account and privacy')}
+  <div class="stack">
+    <div class="surface"><b>Who can see Amma's health readings</b>
+      <div class="kv"><span>You (Meera)</span><span>Yes</span></div><div class="kv"><span>Ravi, coordinator</span><span>Yes</span></div><div class="kv"><span>Caregiver on shift</span><span>Only during the shift</span></div><div class="kv"><span>Anyone else</span><span>No</span></div>
+      <p class="tiny" style="margin:6px 0 0">Consent recorded by Meera Iyer on 18 Oct 2026.</p></div>
+    <div class="surface"><b>Close account</b><p class="small muted" style="margin:4px 0 10px">This deletes:</p>
+      <ul class="delete-list"><li>${ic('trash','ic-sm')}Amma's profile, address and care needs</li><li>${ic('trash','ic-sm')}All BP and sugar readings</li><li>${ic('trash','ic-sm')}All check-in photos and locations</li></ul>
+      <button class="btn danger" style="margin-top:12px" data-act="close">Close account and delete data</button></div>
+  </div></div>`;
+},{caption:'Closing the account deletes the parent’s data (section 7).'});
+
+/* ---------- CAREGIVER ---------- */
+def('c-shift','c','Caregiver: today’s shift',['FR3','BR4'],()=>{
+  if(S.checkedOut) return `<div class="scroll">${bar('No more shifts today')}<div class="surface"><b>Your next shift</b><div class="kv"><span>Saturday, 31 October</span><span>8:00 am</span></div><div class="kv"><span>With</span><span>Amma (Kamala Iyer)</span></div><p class="tiny" style="margin:6px 0 0">The address appears when the shift starts.</p></div></div>`;
+  const rep = S.missed && !S.replacementMissed;
+  return `<div class="scroll">
+    <p class="muted small" style="margin:6px 0 0">Friday, 30 October</p><p class="hello">Vanakkam, Lakshmi</p>
+    <div class="cg-hero" style="margin-top:12px">
+      <div class="row between"><b>Today's shift</b><span class="tiny" style="color:var(--marigold-deep)">8:00 am to 8:00 pm</span></div>
+      <div class="row" style="margin-top:10px"><span class="av">KI</span><div><b>Kamala Iyer, 78</b><div class="small muted">Medicines, mobility help, meals</div></div></div>
+      <div class="addr">${ic('pin','ic-sm')}<div class="small"><b>14, 3rd Main Road, Gandhi Nagar, Adyar</b><br><span class="muted">Shown only for your current shift</span></div></div>
+    </div>
+    ${S.checkedIn?`<div class="surface" style="margin-top:12px"><div class="row between"><b>Checked in at ${S.checkInTime}</b><span class="vbadge">${ic('check')}Location and photo</span></div></div><button class="btn" style="margin-top:12px" data-go="c-log">Continue: tasks and readings</button>`:
+    `<button class="btn" style="margin-top:14px" data-go="c-checkin" ${rep?'disabled':''}>${ic('pin','ic-sm')}Check in</button>${rep?'<p class="tiny center">This shift was reassigned after 8:30.</p>':'<p class="tiny center" style="margin-top:8px">Check in by 8:30 or the family is alerted.</p>'}`}
+    <div class="surface" style="margin-top:12px"><b>Care plan</b>
+      ${[['pill','Morning medicines','Amlodipine 5 mg, Metformin 500 mg'],['bowl','Breakfast and lunch','Soft food, less salt'],['walk','Short walk','10 to 15 minutes, with support']].map(([i,t,d])=>`<div class="row" style="margin-top:10px">${ic(i)}<div class="small"><b>${t}</b><br><span class="muted">${d}</span></div></div>`).join('')}
+    </div>
+  </div>`;
+},{caption:'The address shows only for the current shift (BR4).',dark:false});
+
+def('c-checkin','c','Caregiver: check in',['FR3'],()=>{
+  return `<div class="scroll">${back('c-shift','Check in')}
+  <div class="stack">
+    <div class="map ${S.located?'':'locating'}" id="map">
+      <svg class="streets" viewBox="0 0 340 210" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="340" height="210" fill="#E4EAE5"/><g stroke="#fff" stroke-width="14"><path d="M-10 70h360M-10 150h360M90-10v230M240-10v230"/></g><g stroke="#fff" stroke-width="6"><path d="M-10 110h360M165-10v230"/></g><rect x="100" y="80" width="56" height="62" rx="4" fill="#D3DCD5"/><rect x="176" y="80" width="56" height="22" rx="4" fill="#D3DCD5"/><rect x="250" y="160" width="70" height="40" rx="4" fill="#CFE0D6"/><path d="M0 195q60-20 120-5t110 5 110-10v30H0z" fill="#CBD9E6"/></svg>
+      <span class="pulse"></span><span class="pulse p2"></span><span class="pin">${ic('pinfill')}</span>
+      <div class="locstate" id="locstate">${S.located?`${ic('check','ic-sm')}<span><b>At Amma's home</b>, within 20 m</span>`:`<span class="live"></span><span>Finding your location…</span>`}</div>
+    </div>
+    <div class="camera" id="camera">
+      ${S.photo?photoSVG(S.clock):`<svg viewBox="0 0 300 150" style="width:100%;height:100%" aria-hidden="true"><rect width="300" height="150" fill="#2B3833"/><rect x="104" y="22" width="92" height="104" rx="3" fill="#3B4A43"/></svg><span class="frame"></span><button class="shutter" data-act="snap" aria-label="Take photo at the door"></button>`}
+      <span class="flashlayer" id="flash"></span>
+    </div>
+    <p class="tiny center" style="margin:0">${S.photo?'Photo saved with this visit.':'Take a photo at the front door.'}</p>
+    <button class="btn" data-act="do-checkin" ${(S.located&&S.photo)?'':'disabled'}>Confirm check-in</button>
+  </div></div>`;
+},{caption:'Location and a photo prove the caregiver arrived (FR3).'});
+
+def('c-log','c','Caregiver: tasks and readings',['FR3','BR4'],()=>{
+  const t=[['meds','pill','Morning medicines'],['breakfast','bowl','Breakfast'],['walk','walk','Short walk'],['lunch','bowl','Lunch']];
+  return `<div class="scroll">${back('c-shift','Tasks and readings')}
+  <div class="stack">
+    ${t.map(([k,i,n])=>`<div class="checkrow ${S.tasks[k]?'on':''}" role="checkbox" tabindex="0" aria-checked="${S.tasks[k]}" data-task="${k}"><span class="box">${ic('check')}</span><span class="task">${ic(i)}<b>${n}</b></span>${S.taskTimes?.[k]?`<span class="tiny" style="margin-left:auto">${S.taskTimes[k]}</span>`:''}</div>`).join('')}
+    <div class="surface"><b>Readings</b><div class="vitals" style="margin-top:10px">
+      <div><label class="tiny" for="v-sys">BP top</label><input class="field" id="v-sys" value="${S.bp?S.bp.split('/')[0]:'132'}" inputmode="numeric"></div>
+      <div><label class="tiny" for="v-dia">BP bottom</label><input class="field" id="v-dia" value="${S.bp?S.bp.split('/')[1]:'84'}" inputmode="numeric"></div>
+      <div><label class="tiny" for="v-sug">Sugar</label><input class="field" id="v-sug" value="${S.sugar||'138'}" inputmode="numeric"></div></div>
+      <button class="btn ghost sm" style="margin-top:10px;width:100%" data-act="save-vitals">${S.bp?'Readings saved':'Save readings'}</button>
+      <p class="lock">${ic('lock','ic-sm')}Shared with Meera and Ravi only</p></div>
+    <button class="btn" data-act="checkout">Check out</button>
+  </div></div>`;
+});
+
+/* ---------- ELDER ---------- */
+def('e-home','e','Elder screen',['FR5'],()=>{
+  const who = S.replacement && !S.replacementMissed ? {i:'SM',n:'Selvi'} : S.escalationHandled ? {i:'PD',n:'Priya'} : {i:'LR',n:'Lakshmi'};
+  return `<div class="scroll">
+    <div class="elder-today"><span class="av xl leaf" style="margin:0 auto">${who.i}</span><h2>${who.n} is with you today</h2><p>8 in the morning to 8 at night</p></div>
+    <div class="sos-wrap">
+      <button class="sos" id="sos" aria-label="Hold for 2 seconds to send SOS"><svg class="hold" viewBox="0 0 238 238" aria-hidden="true"><circle cx="119" cy="119" r="110" id="holdring"/></svg>SOS<small>Hold to call for help</small></button>
+      <p class="tiny center" style="margin:0;font-size:14px">Hold the button for 2 seconds. Your family and KinCare will be told at once.</p>
+    </div>
+    <button class="btn ghost callbtn" data-act="call">${ic('phone')}Call Meera</button>
+  </div>`;
+},{caption:'One large button, no small text, for the parent (FR5).',screenClass:'elder'});
+
+def('e-sent','e','SOS sent',['FR5'],()=>`<div class="scroll">
+  <div class="sent-wave" aria-hidden="true"><i></i><i></i><i></i><span>${ic('check')}</span></div>
+  <div class="elder-today" style="margin-top:24px"><h2>Your family has been told</h2><p>Ravi from KinCare will call you now.</p></div>
+  <div style="margin-top:auto;padding-top:30px"><button class="btn ghost callbtn" data-go="e-home" data-dir="back">Back</button></div>
+</div>`,{screenClass:'elder'});
+
+/* ---------- COORDINATOR ---------- */
+function ktab(cur){const t=(id,icn,txt,dot)=>`<button class="tab" data-go="${id}" data-dir="fade" ${cur===id?'aria-current="page"':''}>${ic(icn)}${txt}${dot?'<span class="dot"></span>':''}</button>`;const open=(S.missed&&!S.replacement)||(S.sos&&!S.sosAck);return `<nav class="tabbar" aria-label="Coordinator app">${t('k-queue','bell','Alerts',open)}${t('k-cgs','users','Caregivers')}</nav>`}
+def('k-queue','k','Coordinator: alert queue',['FR6','BR3','FR5'],()=>{
+  const items=[];
+  if(S.sos && !S.sosAck) items.push(`<div class="qitem bad"><span class="sev"></span><div style="flex:1"><div class="row between"><b>SOS: Kamala Iyer</b><span class="timer">${S.sosTime}</span></div><p class="small muted" style="margin:2px 0 10px">Pressed from her phone. Lakshmi is on shift.</p><button class="btn sm" data-act="sos-ack">${ic('phone','ic-sm')}Call and resolve</button></div></div>`);
+  if(S.missed && !S.replacement) items.push(`<button class="qitem bad" data-go="k-assign"><span class="sev"></span><div style="flex:1"><div class="row between"><b>No check-in: Kamala Iyer</b><span class="timer" id="k-timer">3 h 56 m left</span></div><p class="small muted" style="margin:2px 0 0">Lakshmi R. due 8:00, not checked in by 8:30. Adyar 600020.</p></div>${ic('chev')}</button>`);
+  if(S.replacement) items.push(`<div class="qitem"><span class="sev ${S.replacementMissed?'':'done'}"></span><div style="flex:1"><div class="row between"><b>Replacement: Kamala Iyer</b><span class="tiny">${S.replacementMissed?'Escalated':'Resolved 8:34'}</span></div><p class="small muted" style="margin:2px 0 0">${S.replacementMissed?S.replacement+' missed too. With Nandini Rao (BR5).':S.replacement+' assigned, arriving by 11:15.'}</p></div></div>`);
+  items.push(`<div class="qitem"><span class="sev amber"></span><div style="flex:1"><div class="row between"><b>Late check-in: S. Raman</b><span class="tiny">Resolved 8:21</span></div><p class="small muted" style="margin:2px 0 0">Priya D. checked in at 8:21, Besant Nagar.</p></div></div>`);
+  return `<div class="scroll">${bar('Alerts',`<span class="tiny">Chennai South</span>`)}
+    <div class="stack">${items.join('')}</div>
+    ${(!S.missed && !S.sos)?'<p class="tiny center" style="margin-top:18px">No open alerts. Missed check-ins and SOS calls appear here first.</p>':''}
+  </div>${ktab('k-queue')}`;
+},{caption:'Open alerts, oldest first, with the 4-hour clock running.'});
+
+def('k-assign','k','Coordinator: assign replacement',['FR6','BR2','BR3'],()=>{
+  const opts=CAREGIVERS.filter(c=>c.k!=='lakshmi');
+  return `<div class="scroll">${back('k-queue','Assign a replacement')}
+  <div class="stack">
+    <div class="surface"><div class="row between"><b>Kamala Iyer, Adyar</b><span class="timer">3 h 56 m left</span></div><p class="small muted" style="margin:4px 0 0">12-hour day shift. Medicines, mobility help, meals.</p></div>
+    <p class="label" style="margin:4px 0 0">Available now, verified, near 600020</p>
+    ${opts.map((c,i)=>`<div class="cg"><span class="av">${c.i}</span><span style="flex:1"><span class="row between"><h3>${c.n}</h3><span class="tiny">${i===0?'2.1 km':'3.4 km'}</span></span><span class="meta">Can arrive by ${i===0?'11:15':'11:40'}</span>${badges()}<button class="btn sm" style="margin-top:10px" data-assign="${c.n}">Assign ${c.n.split(' ')[0]}</button></span></div>`).join('')}
+  </div></div>`;
+});
+
+def('k-cgs','k','Coordinator: caregivers',['FR7','BR2'],()=>{
+  const n=S.newCg; const ok=n.id&&n.police&&n.training;
+  const tg=(k,t)=>`<div class="row between" style="padding:8px 0"><span class="small">${t}</span><button class="toggle" role="switch" aria-checked="${n[k]}" aria-label="${t}" data-check="${k}"></button></div>`;
+  return `<div class="scroll">${bar('Caregivers',`<button class="iconbtn" aria-label="Add caregiver" data-act="noop">${ic('plus')}</button>`)}
+  <div class="stack">
+    <div class="surface"><div class="row"><span class="av">AK</span><div style="flex:1"><b>${n.name}</b><div class="tiny">Added today. Adyar 600020, ${inr(1050)} per day</div></div></div>
+      <div class="divider" style="margin:12px 0 4px"></div>
+      ${tg('id','ID document checked')}${tg('police','Police verification cleared')}${tg('training','Elder-care training completed')}
+      <div class="note" style="margin-top:8px;color:${ok?'var(--leaf)':'var(--ink-3)'}">${ic(ok?'check':'lock','ic-sm')}<span>${ok?'All checks complete. Now visible to families in search.':'Hidden from family search until all three checks are complete.'}</span></div>
+    </div>
+    ${CAREGIVERS.map(c=>`<div class="cg"><span class="av ${c.k==='lakshmi'?'leaf':''}">${c.i}</span><span style="flex:1"><h3>${c.n}</h3><span class="meta">Visible to families</span>${badges()}</span></div>`).join('')}
+  </div></div>${ktab('k-cgs')}`;
+},{caption:'A caregiver stays hidden until all three checks are done (BR2).'});
+
+/* ---------- ADMIN ---------- */
+function atab(cur){const t=(id,icn,txt,dot)=>`<button class="tab" data-go="${id}" data-dir="fade" ${cur===id?'aria-current="page"':''}>${ic(icn)}${txt}${dot?'<span class="dot"></span>':''}</button>`;return `<nav class="tabbar" aria-label="Admin app">${t('a-kpi','chart','KPIs')}${t('a-esc','escal','Escalations',S.escalated&&!S.escalationHandled)}</nav>`}
+def('a-kpi','a','Care Operations: KPIs',['FR9'],()=>{
+  const k=(t,val,unit,pct,target,tl,foot,spark)=>`<div class="kpi"><h4>${t}</h4><div class="val">${val}<small> ${unit}</small></div><div class="kbar"><i data-w="${pct}"></i><b style="left:${target}%"></b></div><div class="kfoot"><span>Target ${tl}</span><span>${foot}</span></div>${spark}</div>`;
+  const sp=(pts)=>{const w=300,h=46;const xs=pts.map((p,i)=>[i*(w/(pts.length-1)),h-4-p*(h-10)]);const d='M'+xs.map(p=>p.join(',')).join('L');return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d}L${w},${h}L0,${h}Z"/><path class="l" d="${d}"/></svg>`};
+  return `<div class="scroll">${bar('This month, Chennai')}
+  <p class="tiny" style="margin:-8px 0 12px">Sample data from testing, 1 to 30 October</p>
+  <div class="stack">
+    ${k('Minutes from missed shift to family alert','30','min avg',100,100,'30 min or less','On target',sp([.2,.35,.5,.62,.75,.85,.9,.95]))}
+    ${k('No-shows replaced within 4 hours','11 of 12','',92,90,'90%','92%',sp([.5,.55,.7,.65,.8,.85,.88,.92]))}
+    ${k('Visits with check-in, photo and task log','287 of 299','',96,95,'95%','96%',sp([.6,.7,.72,.8,.86,.9,.94,.96]))}
+    ${k('Families renewing after the first block','9 of 14','',64,60,'60% in 12 months','64%',sp([.3,.42,.45,.5,.52,.58,.6,.64]))}
+  </div></div>${atab('a-kpi')}`;
+},{caption:'The four success measures from section 1, on one screen (FR9).'});
+
+def('a-esc','a','Care Operations: escalations',['BR5'],()=>{
+  if(!S.escalated) return `<div class="scroll">${bar('Escalations')}<p class="muted small">Nothing escalated. A case lands here when a replacement caregiver also misses check-in (BR5).</p></div>${atab('a-esc')}`;
+  return `<div class="scroll">${bar('Escalations')}
+  <div class="stack">
+    <div class="qitem bad" style="display:block"><div class="row between"><b>Kamala Iyer, Adyar</b><span class="timer">${S.escalationHandled?'Resolved':'Second miss'}</span></div>
+      <ol class="steps" style="margin-top:12px">
+        <li class="step bad"><span class="sdot">${ic('x','ic-sm')}</span><div><h4>Lakshmi R. missed 8:00</h4><p>Alert at 8:30</p></div></li>
+        <li class="step bad"><span class="sdot">${ic('x','ic-sm')}</span><div><h4>${S.replacement} missed 11:15</h4><p>No check-in by 11:45</p></div></li>
+        <li class="step ${S.escalationHandled?'done':'now'}"><span class="sdot">${S.escalationHandled?ic('check','ic-sm'):''}</span><div><h4>${S.escalationHandled?'Priya D. confirmed, arriving 12:30':'Your decision'}</h4><p>${S.escalationHandled?'Family updated automatically':'Choose a senior caregiver and call the family'}</p></div></li>
+      </ol>
+      ${S.escalationHandled?'':`<button class="btn" data-act="handle-esc">Send Priya D. and call Meera</button>`}
+    </div>
+  </div></div>${atab('a-esc')}`;
+},{caption:'A second miss goes straight to the Care Operations head (BR5).'});
+
+/* ======================= navigation ======================= */
+let current=null; const stacks={f:['f-home'],c:['c-shift'],e:['e-home'],k:['k-queue'],a:['a-kpi']};
+const ROLE_HOME={f:'f-home',c:'c-shift',e:'e-home',k:'k-queue',a:'a-kpi'};
+let lastRoleScreen={...ROLE_HOME};
+function render(id){
+  const el=document.createElement('section');el.className='screen'+(META[id].screenClass?' '+META[id].screenClass:'');el.dataset.id=id;el.innerHTML=SCREENS[id]();return el;
+}
+function go(id,dir='fwd'){
+  if(!SCREENS[id])return;
+  const vp=$('#viewport'); const old=vp.querySelector('.screen:last-child');
+  const el=render(id); vp.appendChild(el);
+  if(old && dir!=='none'){
+    const a=dir==='back'?'back':dir==='fade'?'fade':'fwd';
+    if(a==='back'){vp.insertBefore(el,old);old.classList.add('leave-back');el.classList.add('enter-back');}
+    else{old.classList.add('leave-'+a);el.classList.add('enter-'+a);}
+    setTimeout(()=>old.remove(),430);
+  } else if(old) old.remove();
+  current=id; const m=META[id]; lastRoleScreen[m.role]=id;
+  document.querySelectorAll('.role-btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.role===m.role));
+  $('#caption').textContent=m.caption||'';
+  $('#req-screen').textContent=m.name;
+  $('#req-list').innerHTML=m.req.map(k=>`<div class="req-item"><span class="tag ${REQ[k].t==='br'?'br':REQ[k].t==='dp'?'dp':''}">${label(k)}</span><p>${REQ[k].d}</p></div>`).join('');
+  afterRender(id,el);
+}
+function refresh(){ // re-render current screen in place
+  const vp=$('#viewport'); const old=vp.querySelector(`.screen[data-id="${current}"]`); const sc=old?.querySelector('.scroll')?.scrollTop||0;
+  const el=render(current); vp.replaceChild(el,old); const s=el.querySelector('.scroll'); if(s)s.scrollTop=sc; afterRender(current,el);
+}
+function afterRender(id,el){
+  // cover requirements that a screen demonstrates just by being seen in the right state
+  const seenNow={ 'f-book':['BR1'], 'f-book-list':['BR2'], 'f-services':['SCOPE'], 'c-shift':['BR4'], 'a-kpi':['FR9'] };
+  if(seenNow[id]) cover(...seenNow[id]);
+  if(id==='f-timeline' && (S.checkedIn||S.missed)) {cover('FR4'); if(S.bp) cover('BR4'); moment('timeline');}
+  if(id==='a-kpi'){moment('kpi'); requestAnimationFrame(()=>el.querySelectorAll('.kbar i').forEach(i=>i.style.width=i.dataset.w+'%'));}
+  if(id==='c-checkin' && !S.located){ setTimeout(()=>{ if(current!=='c-checkin')return; S.located=true; const ls=el.querySelector('#locstate'); el.querySelector('#map').classList.remove('locating'); ls.innerHTML=`${ic('check','ic-sm')}<span><b>At Amma's home</b>, within 20 m</span>`; const b=el.querySelector('[data-act="do-checkin"]'); if(S.photo)b.disabled=false; },1800); }
+  if(id==='e-home') wireSOS(el);
+  if(id==='f-book'){ const sel=el.querySelector('#b-start'); sel.addEventListener('change',()=>{S.draft.start=sel.value.split(',')[0]}); }
+  statusDark(false);
+}
+function statusDark(on){$('#statusbar').classList.toggle('dark',on)}
+
+/* ======================= actions ======================= */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-go],[data-act],[data-shift],[data-pick],[data-task],[data-assign],[data-check],[data-rate],[data-toggle-pill],.role-btn,.moment');
+  if(!t)return;
+  if(t.classList.contains('role-btn')){switchRole(t.dataset.role);return}
+  if(t.classList.contains('moment')){runMoment(t.dataset.m);return}
+  if(t.dataset.go){go(t.dataset.go,t.dataset.dir||'fwd');return}
+  if(t.hasAttribute('data-toggle-pill')){t.setAttribute('aria-pressed',t.getAttribute('aria-pressed')!=='true');return}
+  if(t.dataset.shift){S.draft.shift=+t.dataset.shift;refresh();return}
+  if(t.dataset.pick){S.draft.cg=t.dataset.pick;go('f-cg');return}
+  if(t.dataset.rate){S.rated=+t.dataset.rate;refresh();return}
+  if(t.dataset.task){const k=t.dataset.task;S.tasks[k]=!S.tasks[k];S.taskTimes=S.taskTimes||{};const tm={meds:'8:20 am',breakfast:'8:45 am',walk:'10:05 am',lunch:'1:10 pm'};if(S.tasks[k]){S.taskTimes[k]=tm[k];S.fresh[k]=true}else delete S.taskTimes[k];refresh();return}
+  if(t.dataset.check){S.newCg[t.dataset.check]=!S.newCg[t.dataset.check];if(S.newCg.id&&S.newCg.police&&S.newCg.training){cover('FR7','BR2');moment('verify');toast('Anitha K. is now visible to families')}refresh();return}
+  if(t.dataset.assign){S.replacement=t.dataset.assign;S.fresh.rep=true;cover('FR6','BR3');moment('assign');toast(`${S.replacement} assigned. Meera has been told`);go('k-queue','back');return}
+  const a=t.dataset.act;
+  switch(a){
+    case 'consent': S.consent=!S.consent; refresh(); break;
+    case 'save-parent': if(!S.consent)return; S.parentAdded=true; cover('FR1','CONSENT'); moment('parent'); toast('Appa’s profile saved with your consent'); go('f-home','back'); break;
+    case 'minus': {const m=$('#min-msg'); if(m){m.textContent='Bookings start at 14 days so caregivers can plan their schedule.'; m.style.color='var(--marigold-deep)';} cover('BR1'); break;}
+    case 'plus': toast('Longer bookings come in 14-day blocks'); break;
+    case 'confirm-booking': S.booking={...S.draft}; cover('FR2','BR1','SCOPE'); moment('book'); go('f-done'); break;
+    case 'snap': {const f=$('#flash'); f.classList.add('go'); setTimeout(()=>{S.photo=true;refresh()},350); break;}
+    case 'do-checkin': if(S.missed){resetShift()} S.checkedIn=true; S.checkInTime='8:02'; setClock('8:02'); S.fresh.in=true; cover('FR3'); moment('checkin'); toast('Checked in at 8:02. Meera can see it now'); go('c-shift','back'); break;
+    case 'save-vitals': {const sys=$('#v-sys').value,dia=$('#v-dia').value,sug=$('#v-sug').value; S.bp=`${sys}/${dia}`; S.sugar=sug; S.vitalsTime='10:30 am'; S.fresh.vitals=true; cover('FR3','BR4'); toast('Readings saved and shared with Meera'); refresh(); break;}
+    case 'checkout': if(!S.checkedIn)return; S.checkedOut=true; S.fresh.out=true; setClock('8:04'); cover('FR3'); toast('Checked out. Shift complete'); go('c-shift','back'); break;
+    case 'sos-ack': S.sosAck=true; toast('SOS resolved. Meera updated'); refresh(); break;
+    case 'handle-esc': S.escalationHandled=true; toast('Priya D. confirmed. Meera has been called'); refresh(); break;
+    case 'renew': S.renewed='renew'; cover('FR8'); moment('renew'); toast('Renewed for 14 days'); refresh(); break;
+    case 'end': S.renewed='end'; cover('FR8'); moment('renew'); refresh(); break;
+    case 'close': S.closed=true; cover('DELETE'); moment('close'); refresh(); break;
+    case 'restore': S.closed=false; go('f-home','back'); break;
+    case 'call': toast('Calling… (not connected in the prototype)'); break;
+    case 'noop': toast('Not part of this prototype'); break;
+  }
+});
+document.addEventListener('keydown',e=>{ if((e.key===' '||e.key==='Enter') && e.target.matches('[role="checkbox"]')){e.preventDefault();e.target.click()} });
+
+function switchRole(r){ const id=lastRoleScreen[r]||ROLE_HOME[r]; go(id,'fade'); }
+function resetShift(){S.missed=false;S.replacement=null;S.replacementMissed=false;S.escalated=false;S.escalationHandled=false}
+
+/* SOS hold */
+function wireSOS(el){
+  const b=el.querySelector('#sos'), ring=el.querySelector('#holdring'); let start=0,raf=0; const L=691, HOLD=1600;
+  const tick=()=>{const p=Math.min(1,(performance.now()-start)/HOLD); ring.style.strokeDashoffset=L*(1-p); if(p>=1){done();return} raf=requestAnimationFrame(tick)};
+  const down=e=>{e.preventDefault();start=performance.now();b.classList.add('holding');raf=requestAnimationFrame(tick)};
+  const up=()=>{cancelAnimationFrame(raf);b.classList.remove('holding');ring.style.transition='stroke-dashoffset .3s';ring.style.strokeDashoffset=L;setTimeout(()=>ring.style.transition='',300)};
+  const done=()=>{cancelAnimationFrame(raf);S.sos=true;S.sosAck=false;S.sosTime=S.clock;cover('FR5');moment('sos');go('e-sent','fade');};
+  b.addEventListener('pointerdown',down); b.addEventListener('pointerup',up); b.addEventListener('pointerleave',up);
+  b.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat){down(e)}}); b.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')up()});
+}
+
+/* ======================= key moments ======================= */
+function runMoment(m){
+  switch(m){
+    case 'parent': go('f-parent','fade'); break;
+    case 'book': go('f-book','fade'); break;
+    case 'checkin': if(S.missed)resetShift(); setClock('7:58'); go('c-shift','fade'); break;
+    case 'timeline': go('f-timeline','fade'); break;
+    case 'miss':
+      S.checkedIn=false;S.checkedOut=false;S.photo=false;S.located=false;S.tasks={meds:false,breakfast:false,walk:false,lunch:false};S.bp=null;S.sugar=null;S.taskTimes={};
+      S.replacement=null;S.replacementMissed=false;S.escalated=false;S.escalationHandled=false;
+      S.missed=true;S.fresh.miss=true;setClock('8:30');cover('FR5','BR3');moment('miss');go('f-home','fade');
+      setTimeout(()=>toast('Alert sent to Meera and Ravi at 8:30'),500); break;
+    case 'assign':
+      if(!S.missed){S.missed=true;setClock('8:30');cover('FR5','BR3');moment('miss')}
+      S.replacement=null; go('k-queue','fade'); break;
+    case 'escalate':
+      if(!S.missed){S.missed=true;cover('FR5','BR3')} if(!S.replacement){S.replacement='Selvi M.'}
+      S.replacementMissed=true;S.escalated=true;S.escalationHandled=false;setClock('11:45');cover('BR5');moment('escalate');go('a-esc','fade');
+      setTimeout(()=>toast('Second miss escalated to Nandini Rao'),500); break;
+    case 'verify': go('k-cgs','fade'); break;
+    case 'sos': go('e-home','fade'); break;
+    case 'renew': go('f-renew','fade'); break;
+    case 'kpi': go('a-kpi','fade'); break;
+    case 'close': S.closed=false; go('f-account','fade'); break;
+  }
+}
+
+/* ======================= boot ======================= */
+function buildCover(){
+  $('#cover-grid').innerHTML=REQ_ORDER.map(k=>`<span class="chip-cov ${REQ[k].t==='br'?'br':REQ[k].t==='dp'?'dp':''}" data-k="${k}" title="${REQ[k].d.replace(/"/g,'&quot;')}">${label(k)}</span>`).join('');
+  updateCover();
+}
+$('#reset').addEventListener('click',()=>{S=fresh();setClock('7:52');document.querySelectorAll('.moment').forEach(b=>b.classList.remove('done'));buildCover();lastRoleScreen={...ROLE_HOME};go('f-home','fade')});
+buildCover();
+go('f-home','none');
+</script>
+</body>
+</html>
