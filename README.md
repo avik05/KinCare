@@ -3,6 +3,8 @@
 Verified caregivers for elderly parents, and proof of every visit, for families who live in another city.
 IT for Managers capstone, GLIM Chennai, Section 4, Group 5 (TCS).
 
+**Live app:** https://kincare-glim.vercel.app
+
 - Requirements: [`docs/BRD.pdf`](docs/BRD.pdf)
 - Clickable prototype: [`docs/prototype.html`](docs/prototype.html)
 - Data model: [`docs/data-schema.pdf`](docs/data-schema.pdf)

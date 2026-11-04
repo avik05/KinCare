@@ -9,7 +9,7 @@ The specification is `docs/BRD.pdf` (submitted Milestone 2). The look and every 
 ## Stack (fixed)
 - React 18 + Vite + TypeScript, plain CSS (tokens copied from the prototype). No UI kit.
 - Supabase for the database, login (email and password) and check-in photo storage.
-- Deployed on Vercel from the `main` branch. Installable as a PWA.
+- Deployed on Vercel from the `main` branch at https://kincare-glim.vercel.app. Installable as a PWA.
 - Free tiers only. Do not add paid services or anything that needs a card.
 
 ## Users and access
@@ -30,7 +30,7 @@ The specification is `docs/BRD.pdf` (submitted Milestone 2). The look and every 
 - Consent is required before a parent profile is saved. Closing an account deletes the parent's profile, readings and photos.
 
 ## Where things live
-- `supabase/migrations/` schema, row-level security, functions, cron. `supabase/seed.sql` demo data. `supabase/setup.sql` is all of them in one file for the Supabase SQL editor (regenerate with `npm run sql:bundle`).
+- `supabase/migrations/` schema, row-level security, functions, cron, demo data (`reset_demo_data()` in 0005). New changes go in a new numbered migration. `supabase/setup.sql` is all of them in one file for the Supabase SQL editor (regenerate with `npm run sql:bundle`).
 - `src/` the app. `src/screens/<role>/` one file per screen. `src/lib/` Supabase client and data helpers. `src/styles.css` design tokens and components.
 
 ## Working rules
