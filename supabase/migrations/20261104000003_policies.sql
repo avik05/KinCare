@@ -106,11 +106,11 @@ create policy checkins_upload on storage.objects for insert to authenticated
 create policy checkins_read on storage.objects for select to authenticated
   using (bucket_id = 'checkins' and (
     public.is_staff()
-    or exists (select 1 from public.parents p where p.id::text = (storage.foldername(name))[1] and p.family_id = auth.uid())
+    or exists (select 1 from public.parents p where p.id::text = (storage.foldername(objects.name))[1] and p.family_id = auth.uid())
     or exists (select 1 from public.shifts s where s.id::text = (storage.foldername(name))[2] and s.caregiver_id = public.my_caregiver_id())));
 
 create policy checkins_delete_family on storage.objects for delete to authenticated
   using (bucket_id = 'checkins' and exists (
-    select 1 from public.parents p where p.id::text = (storage.foldername(name))[1] and p.family_id = auth.uid()));
+    select 1 from public.parents p where p.id::text = (storage.foldername(objects.name))[1] and p.family_id = auth.uid()));
 
 revoke execute on function public.caregiver_shifts, public.elder_today from public, anon;

@@ -53,6 +53,7 @@ a{color:var(--leaf);font-weight:700}
 .label{font-weight:700;font-size:14px;margin:0 0 6px;display:block}
 .field{width:100%;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:11px 12px;background:var(--paper);font-size:16px}
 .field:focus{outline:none;border-color:var(--leaf)}
+.field::placeholder{color:#A9B3AE}
 .err{background:var(--alert-soft);color:var(--alert-deep);border-radius:var(--r-sm);padding:10px 12px;font-size:14px}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line-2);border-radius:var(--r-md);padding:4px;gap:4px}
 .seg button{border:0;background:transparent;border-radius:11px;padding:10px;font-weight:700;font-size:14.5px;color:var(--ink-2)}

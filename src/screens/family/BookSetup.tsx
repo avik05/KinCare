@@ -9,16 +9,30 @@ import { FamilyTabs, useDraft } from './booking';
 export default function BookSetup() {
   const nav = useNavigate();
   const { draft, set } = useDraft();
-  const { data: parents, loading, error } = useLive(() => q<any[]>(supabase.from('parents').select('id, name, relation, address, pin_code').order('created_at')), [], 0);
+  const { data: parents, loading, error } = useLive(() => q<any[]>(supabase.from('parents').select('id, name, relation, address, pin_code, bookings(end_date, status)').order('created_at')), [], 0);
   const [msg, setMsg] = useState('');
-  useEffect(() => { if (parents?.length && !parents.find(p => p.id === draft.parentId)) set({ parentId: parents[0].id }); }, [parents]);
+  // BR1: one booking per address at a time, so the first free day is after any active block
+  const freeFrom = (p: any) => {
+    const ends = (p?.bookings || []).filter((b: any) => b.status === 'active').map((b: any) => b.end_date).sort();
+    const last = ends[ends.length - 1];
+    const next = last ? new Date(Date.parse(last + 'T12:00:00+05:30') + 864e5).toISOString().slice(0, 10) : todayIST(1);
+    return next > todayIST(1) ? next : todayIST(1);
+  };
+  useEffect(() => {
+    if (!parents?.length) return;
+    const p = parents.find(x => x.id === draft.parentId) || parents[0];
+    if (p.id !== draft.parentId || draft.start < freeFrom(p)) set({ parentId: p.id, start: freeFrom(p) });
+  }, [parents, draft.parentId]);
   if (loading) return <div className="shell"><Loading /></div>;
   if (!parents?.length) return (
     <div className="shell"><main className="page"><AppBar title="Book care" back="/f" />
       <div className="surface stack center"><b>Add a parent first</b><p className="muted small" style={{ margin: 0 }}>We need their address and your consent before booking.</p><Link className="btn" to="/f/add-parent">Add a parent</Link></div>
     </main><FamilyTabs /></div>
   );
-  const dates = Array.from({ length: 7 }, (_, i) => todayIST(i + 1));
+  const sel = parents.find(p => p.id === draft.parentId) || parents[0];
+  const first = freeFrom(sel);
+  const dates = Array.from({ length: 7 }, (_, i) => new Date(Date.parse(first + 'T12:00:00+05:30') + i * 864e5).toISOString().slice(0, 10));
+  const booked = first > todayIST(1);
 
   return (
     <div className="shell"><main className="page stack">
@@ -42,7 +56,7 @@ export default function BookSetup() {
         <select className="field" id="b-start" value={draft.start} onChange={e => set({ start: e.target.value })}>
           {dates.map(d => <option key={d} value={d}>{dayLabel(d)}</option>)}
         </select>
-        <p className="tiny" style={{ margin: '4px 0 0' }}>Shifts start at 8:00 am, India time.</p></div>
+        <p className="tiny" style={{ margin: '4px 0 0' }}>{booked ? `Care is already booked until the day before ${dayLabel(first)}. Shifts start at 8:00 am, India time.` : 'Shifts start at 8:00 am, India time.'}</p></div>
       <div className="surface">
         <div className="row between"><span className="label" style={{ margin: 0 }}>Length of booking</span><span className="tag">14-day blocks</span></div>
         <div className="row between" style={{ marginTop: 10 }}>
