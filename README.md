@@ -37,8 +37,8 @@ Password for all: `KinCare@2026`
 All people, phone numbers and addresses are invented.
 
 ### Running the live demo
-1. Sign in as Nandini → **Settings** → **Reset demo data**. Kamala's shift now starts 10 minutes from now.
-2. For a short demo, set **Missed check-in alert** to 2 minutes. Set it back to 30 afterwards (the BRD rule).
+1. Open **https://kincare-glim.vercel.app/demo**. It puts every demo account back to the start, signs out anyone on that browser, and sets the missed check-in alert to 30 minutes (the BRD rule). Kamala's shift starts 10 minutes later.
+2. For a short demo, open **https://kincare-glim.vercel.app/demo?alert=2** instead, so a missed visit raises its alert 2 minutes after the shift starts.
 3. Either check in as Lakshmi (phone camera and location), or let the shift pass to show the missed-check-in alert on Meera's and Ravi's screens, then assign a replacement as Ravi.
 
 Works on phones (bottom tabs) and laptops (sidebar, two-pane alert desk, caregiver table).

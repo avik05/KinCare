@@ -7,14 +7,14 @@ import { Avatar, BrandMark, Btn, DoorPhoto, ErrorBox, ProofCard } from '../../co
 
 export { BrandMark };
 
-const DEMO = [
+export const DEMO = [
   { email: 'meera@kincare.demo', role: 'Family', who: 'Meera Iyer, daughter in Singapore', i: 'MI' },
   { email: 'lakshmi@kincare.demo', role: 'Caregiver', who: 'Lakshmi R., Adyar', i: 'LR' },
   { email: 'kamala@kincare.demo', role: 'Elder', who: 'Kamala Iyer, Chennai', i: 'KI' },
   { email: 'ravi@kincare.demo', role: 'Coordinator', who: 'Ravi Kumar, KinCare Chennai', i: 'RK' },
   { email: 'nandini@kincare.demo', role: 'Care Operations head', who: 'Nandini Rao', i: 'NR' },
 ];
-const DEMO_PW = 'KinCare@2026';
+export const DEMO_PW = 'KinCare@2026';
 
 /** The left panel on wide screens: what KinCare proves, shown as a real visit record. */
 export function AuthSide() {

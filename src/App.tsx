@@ -4,6 +4,7 @@ import { configured } from './lib/supabase';
 import { AttentionProvider } from './components/layout';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
+import DemoReset from './screens/auth/DemoReset';
 import { BookingProvider } from './screens/family/booking';
 import FamilyHome from './screens/family/Home';
 import AddParent from './screens/family/AddParent';
@@ -58,6 +59,7 @@ export default function App() {
       <Route path="/" element={<Start />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/demo" element={<DemoReset />} />
 
       <Route path="/f/*" element={<Guard role="family"><BookingProvider><Routes>
         <Route index element={<FamilyHome />} />
