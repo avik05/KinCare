@@ -2,71 +2,86 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase, cleanError } from '../../lib/supabase';
 import { HOME, useAuth } from '../../lib/auth';
-import { ErrorBox } from '../../components/ui';
+import Icon from '../../components/Icon';
+import { Avatar, BrandMark, Btn, DoorPhoto, ErrorBox, ProofCard } from '../../components/ui';
 
-export function BrandMark({ size = 44 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-      <rect width="40" height="40" rx="12" fill="#1F4D3B" />
-      <path d="M20 29.5s-8.5-5-8.5-11.2A4.9 4.9 0 0 1 20 15.4a4.9 4.9 0 0 1 8.5 2.9c0 6.2-8.5 11.2-8.5 11.2z" fill="#E39A2D" />
-      <path d="M16.5 20.3l2.5 2.5 4.6-4.6" fill="none" stroke="#1F4D3B" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+export { BrandMark };
 
 const DEMO = [
-  { email: 'meera@kincare.demo', role: 'Family', who: 'Meera, Singapore', i: 'MI' },
-  { email: 'lakshmi@kincare.demo', role: 'Caregiver', who: 'Lakshmi R.', i: 'LR' },
-  { email: 'kamala@kincare.demo', role: 'Elder', who: 'Kamala, Chennai', i: 'KI' },
-  { email: 'ravi@kincare.demo', role: 'Coordinator', who: 'Ravi Kumar', i: 'RK' },
-  { email: 'nandini@kincare.demo', role: 'Care Operations', who: 'Nandini Rao', i: 'NR' },
-  { email: 'priya@kincare.demo', role: 'Caregiver', who: 'Priya D.', i: 'PD' },
+  { email: 'meera@kincare.demo', role: 'Family', who: 'Meera Iyer, daughter in Singapore', i: 'MI' },
+  { email: 'lakshmi@kincare.demo', role: 'Caregiver', who: 'Lakshmi R., Adyar', i: 'LR' },
+  { email: 'kamala@kincare.demo', role: 'Elder', who: 'Kamala Iyer, Chennai', i: 'KI' },
+  { email: 'ravi@kincare.demo', role: 'Coordinator', who: 'Ravi Kumar, KinCare Chennai', i: 'RK' },
+  { email: 'nandini@kincare.demo', role: 'Care Operations head', who: 'Nandini Rao', i: 'NR' },
 ];
+const DEMO_PW = 'KinCare@2026';
+
+/** The left panel on wide screens: what KinCare proves, shown as a real visit record. */
+export function AuthSide() {
+  return (
+    <aside className="auth-side">
+      <div className="logo"><BrandMark on="dark" /><b>KinCare</b></div>
+      <h2>Know every visit happened.</h2>
+      <p className="a-lede">Verified caregivers for your parents in another city. Each visit is checked in at the door with the time, location and a photo, and you are alerted within 30 minutes if no one arrives.</p>
+      <ProofCard img={<DoorPhoto />} tags={[{ icon: 'clock', text: '8:04 am' }, { icon: 'pin', text: 'Within 12 m of home' }]}>
+        <div className="row"><Avatar text="LR" tone="brand" size="sm" />
+          <div className="grow"><b style={{ fontWeight: 600 }}>Lakshmi checked in</b><div className="t-sm muted">Amma's home, Adyar, Chennai</div></div>
+          <span className="pill ok"><Icon name="check" size="sm" />Verified</span></div>
+      </ProofCard>
+      <p className="a-foot">IT for Managers capstone, Great Lakes Institute of Management, Chennai. All people and places in the demo are invented.</p>
+    </aside>
+  );
+}
 
 export default function Login() {
   const { session, profile } = useAuth();
   const nav = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
+  useEffect(() => { document.title = 'Sign in | KinCare'; }, []);
   useEffect(() => { if (session && profile) nav(HOME[profile.role], { replace: true }); }, [session, profile]);
 
-  async function signIn(e?: FormEvent, em = email, pw = password) {
-    e?.preventDefault();
-    setBusy(true); setErr(null);
+  async function signIn(em: string, pw: string, who: string) {
+    setBusy(who); setErr(null);
     const { error } = await supabase.auth.signInWithPassword({ email: em.trim(), password: pw });
-    setBusy(false);
-    if (error) setErr(cleanError(error.message));
+    if (error) { setBusy(null); setErr(cleanError(error.message)); }
   }
+  const submit = (e: FormEvent) => { e.preventDefault(); signIn(email, password, 'form'); };
 
   return (
-    <div className="shell"><main className="page stack">
-      <div className="login-hero"><BrandMark /><h1>KinCare</h1></div>
-      <p className="muted" style={{ margin: 0 }}>Verified caregivers for your parents, and proof of every visit, wherever you live.</p>
-      <form className="surface stack" onSubmit={signIn}>
-        <div><label className="label" htmlFor="email">Email</label>
-          <input className="field" id="email" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></div>
-        <div><label className="label" htmlFor="password">Password</label>
-          <input className="field" id="password" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></div>
-        <ErrorBox msg={err} />
-        <button className="btn" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <p className="small center" style={{ margin: 0 }}>New to KinCare? <Link to="/signup">Create a family account</Link></p>
-      </form>
-      <section className="stack" aria-labelledby="demo-h">
-        <div>
-          <h2 id="demo-h" style={{ fontFamily: 'var(--display)', fontSize: 17, margin: '8px 0 2px' }}>Try a demo account</h2>
-          <p className="tiny" style={{ margin: 0 }}>Sample people and data for the capstone demo. Password for all: KinCare@2026</p>
-        </div>
-        <div className="demo-grid">
+    <div className="auth">
+      <AuthSide />
+      <main className="auth-main">
+        <div className="logo"><BrandMark /><b>KinCare</b></div>
+        <h1>Sign in</h1>
+        <p className="lede">Welcome back. Use the email you registered with.</p>
+        <form className="stack" style={{ marginTop: 24, gap: 16 }} onSubmit={submit} noValidate={false}>
+          <div className="field"><label className="label" htmlFor="email">Email</label>
+            <input className="input" id="email" type="email" autoComplete="email" inputMode="email" required value={email} onChange={e => setEmail(e.target.value)} /></div>
+          <div className="field"><label className="label" htmlFor="password">Password</label>
+            <div className="pw"><input className="input" id="password" type={show ? 'text' : 'password'} autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
+              <button type="button" onClick={() => setShow(!show)} aria-pressed={show}>{show ? 'Hide' : 'Show'}</button></div></div>
+          <ErrorBox msg={err} />
+          <Btn className="block" busy={busy === 'form'} busyText="Signing in" disabled={!!busy}>Sign in</Btn>
+          <p className="t-sm muted center">New to KinCare? <Link to="/signup">Create a family account</Link></p>
+        </form>
+
+        <div className="or">or try a demo account</div>
+        <p className="t-xs faint" style={{ marginBottom: 10 }}>Sample people and data for the capstone demo. Password for all: {DEMO_PW}</p>
+        <div className="panel flush demo-list">
           {DEMO.map(d => (
-            <button key={d.email} className="demo-btn" disabled={busy} onClick={() => { setEmail(d.email); setPassword('KinCare@2026'); signIn(undefined, d.email, 'KinCare@2026'); }}>
-              <span className="av sm leaf">{d.i}</span><span><b>{d.role}</b><span>{d.who}</span></span>
+            <button key={d.email} className="li" disabled={!!busy} onClick={() => { setEmail(d.email); setPassword(DEMO_PW); signIn(d.email, DEMO_PW, d.email); }}>
+              <Avatar text={d.i} tone="brand" size="sm" />
+              <span className="li-t"><b>{d.role}</b><span>{d.who}</span></span>
+              {busy === d.email ? <span className="mini-spin" aria-label="Signing in" /> : <Icon name="chev" size="sm" className="ic-sm chev" />}
             </button>
           ))}
         </div>
-      </section>
-    </main></div>
+      </main>
+    </div>
   );
 }

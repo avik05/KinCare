@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { HOME, Role, useAuth } from './lib/auth';
 import { configured } from './lib/supabase';
-import { Loading } from './components/ui';
+import { AttentionProvider } from './components/layout';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import { BookingProvider } from './screens/family/booking';
@@ -15,7 +15,6 @@ import BookDone from './screens/family/BookDone';
 import Timeline from './screens/family/Timeline';
 import AlertDetail from './screens/family/AlertDetail';
 import Renew from './screens/family/Renew';
-import Services from './screens/family/Services';
 import Account from './screens/family/Account';
 import CaregiverToday from './screens/caregiver/Today';
 import CheckIn from './screens/caregiver/CheckIn';
@@ -23,17 +22,20 @@ import VisitLog from './screens/caregiver/VisitLog';
 import ElderHome from './screens/elder/Home';
 import SosSent from './screens/elder/SosSent';
 import AlertQueue from './screens/coordinator/Alerts';
-import Assign from './screens/coordinator/Assign';
 import Caregivers from './screens/coordinator/Caregivers';
 import AddCaregiver from './screens/coordinator/AddCaregiver';
 import Kpis from './screens/admin/Kpis';
 import Escalations from './screens/admin/Escalations';
 import Settings from './screens/admin/Settings';
 
+function Boot() {
+  return <div className="boot" role="status" aria-label="Loading"><span className="spin" /></div>;
+}
+
 function Guard({ role, children }: { role: Role | Role[]; children: JSX.Element }) {
   const { session, profile, ready } = useAuth();
   const loc = useLocation();
-  if (!ready || (session && !profile)) return <div className="shell"><Loading /></div>;
+  if (!ready || (session && !profile)) return <Boot />;
   if (!session) return <Navigate to="/login" state={{ from: loc.pathname }} replace />;
   const roles = Array.isArray(role) ? role : [role];
   if (!profile || !roles.includes(profile.role)) return <Navigate to={profile ? HOME[profile.role] : '/login'} replace />;
@@ -42,17 +44,17 @@ function Guard({ role, children }: { role: Role | Role[]; children: JSX.Element 
 
 function Start() {
   const { session, profile, ready } = useAuth();
-  if (!ready || (session && !profile)) return <div className="shell"><Loading /></div>;
+  if (!ready || (session && !profile)) return <Boot />;
   return <Navigate to={session && profile ? HOME[profile.role] : '/login'} replace />;
 }
 
 export default function App() {
   if (!configured) {
-    return <div className="shell"><div className="page"><p className="err">KinCare is not connected to its database. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to the environment and redeploy.</p></div></div>;
+    return <div className="boot"><p className="err" style={{ maxWidth: 420 }}>KinCare is not connected to its database. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to the environment and redeploy.</p></div>;
   }
   const staff: Role[] = ['coordinator', 'admin'];
   return (
-    <Routes>
+    <AttentionProvider><Routes>
       <Route path="/" element={<Start />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
@@ -69,7 +71,7 @@ export default function App() {
         <Route path="timeline/:parentId" element={<Timeline />} />
         <Route path="alert/:id" element={<AlertDetail />} />
         <Route path="renew/:bookingId" element={<Renew />} />
-        <Route path="services" element={<Services />} />
+        <Route path="services" element={<Navigate to="/f/account" replace />} />
         <Route path="account" element={<Account />} />
       </Routes></BookingProvider></Guard>} />
 
@@ -86,7 +88,8 @@ export default function App() {
 
       <Route path="/k/*" element={<Guard role={staff}><Routes>
         <Route index element={<AlertQueue />} />
-        <Route path="assign/:alertId" element={<Assign />} />
+        <Route path="alert/:alertId" element={<AlertQueue />} />
+        <Route path="assign/:alertId" element={<AlertQueue />} />
         <Route path="caregivers" element={<Caregivers />} />
         <Route path="caregivers/new" element={<AddCaregiver />} />
       </Routes></Guard>} />
@@ -98,6 +101,6 @@ export default function App() {
       </Routes></Guard>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    </Routes></AttentionProvider>
   );
 }

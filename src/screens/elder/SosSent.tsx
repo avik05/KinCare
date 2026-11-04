@@ -1,15 +1,17 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 
 export default function SosSent() {
+  useEffect(() => { document.title = 'Help is coming | KinCare'; }, []);
   return (
-    <div className="shell white"><main className="page" style={{ display: 'flex', flexDirection: 'column' }}>
+    <main className="elder">
       <div className="sent-wave" aria-hidden="true"><i /><i /><i /><span><Icon name="check" className="" /></span></div>
-      <div className="elder-today" style={{ marginTop: 24 }} role="status">
+      <div className="elder-who" style={{ marginTop: 32 }} role="status">
         <h1>Your family has been told</h1>
-        <p>KinCare will call you now. Stay where you are.</p>
+        <p style={{ fontVariantNumeric: 'normal' }}>KinCare will call you in a moment. Stay where you are.</p>
       </div>
-      <Link className="btn ghost" style={{ marginTop: 'auto', fontSize: 19, padding: 16 }} to="/e">Back</Link>
-    </main></div>
+      <Link className="btn secondary lg block" style={{ marginTop: 'auto', fontSize: 19 }} to="/e">Back</Link>
+    </main>
   );
 }

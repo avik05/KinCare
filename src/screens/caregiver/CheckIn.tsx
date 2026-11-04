@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { rpc, supabase } from '../../lib/supabase';
 import { useLive } from '../../lib/hooks';
 import Icon from '../../components/Icon';
-import { AppBar, ErrorBox, Loading, useToast } from '../../components/ui';
+import { Btn, Empty, ErrorBox, useToast } from '../../components/ui';
+import { Screen, ScreenLoading } from '../../components/layout';
 import { loadShifts } from './Today';
 
 /** Shrinks a phone photo to at most 1280 px so it uploads quickly and fits the free storage tier. */
@@ -13,7 +14,7 @@ async function compress(file: File): Promise<Blob> {
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
   canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return new Promise(res => canvas.toBlob(b => res(b!), 'image/jpeg', 0.75));
+  return new Promise((res, rej) => canvas.toBlob(b => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', 0.75));
 }
 
 type Loc = { lat: number; lng: number; acc: number };
@@ -31,22 +32,30 @@ export default function CheckIn() {
 
   function locate() {
     setLocErr(null); setLoc(null);
-    if (!navigator.geolocation) return setLocErr('This browser cannot share location. Use Chrome or Safari on your phone.');
+    if (!navigator.geolocation) return setLocErr('This browser cannot share location. Open KinCare in Chrome or Safari on your phone.');
     navigator.geolocation.getCurrentPosition(
       p => setLoc({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }),
-      e => setLocErr(e.code === 1 ? 'Location is blocked. Allow location for this site in your browser settings, then try again.' : 'Could not find your location. Step outside or near a window and try again.'),
+      e => setLocErr(e.code === 1 ? 'Location is blocked. Allow location for this site in your browser settings, then try again.' : 'Could not find your location. Step near a window or outside and try again.'),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
   }
   useEffect(locate, []);
+  useEffect(() => () => { if (photo) URL.revokeObjectURL(photo.url); }, [photo]);
 
-  if (loading) return <div className="shell"><Loading /></div>;
+  if (loading) return <ScreenLoading title="Check in" back="/c" blocks={[200, 300]} />;
   const s = data?.find(x => x.shift_id === shiftId);
-  if (!s) return <div className="shell"><main className="page"><AppBar title="Check in" back="/c" /><ErrorBox msg="This shift is not available to you right now." /></main></div>;
+  if (!s || s.status !== 'scheduled') return (
+    <Screen title="Check in" back="/c" backLabel="Today">
+      <div className="panel"><Empty icon="cal" title={s?.status === 'checked_in' ? 'You are already checked in' : 'This shift is not open for check-in'}>
+        {s?.status === 'checked_in' ? 'Go back and log tasks and readings.' : 'Check-in opens an hour before the shift starts. If this looks wrong, call your coordinator.'}
+      </Empty></div>
+    </Screen>
+  );
 
   async function onPhoto(f?: File) {
     if (!f) return;
+    setErr(null);
     try { const blob = await compress(f); setPhoto({ blob, url: URL.createObjectURL(blob) }); }
-    catch { setErr('Could not read that photo. Try taking it again.'); }
+    catch { setErr('Could not read that photo. Take it again.'); }
   }
 
   async function confirm() {
@@ -62,30 +71,43 @@ export default function CheckIn() {
     } catch (x: any) { setErr(x.message); setBusy(false); }
   }
 
+  const missing = !loc && !photo ? 'Location and a door photo are both needed.' : !loc ? 'Waiting for your location.' : !photo ? 'Take the door photo to finish.' : '';
   return (
-    <div className="shell"><main className="page stack">
-      <AppBar title="Check in" back="/c" />
-      <div className={'locbox' + (!loc && !locErr ? ' locating' : '')}>
-        <span className="pulse" /><span className="pulse p2" />
-        <span className="pin"><Icon name="pinfill" className="" /></span>
-        <div className="locstate">
-          {loc ? <><Icon name="check" size="sm" /><span><b>Location found</b>, accurate to {Math.round(loc.acc)} m</span></>
-            : locErr ? <><Icon name="warn" size="sm" /><span>{locErr} <button className="linkbtn" onClick={locate}>Try again</button></span></>
-            : <><span className="live" /><span>Finding your location{'…'}</span></>}
-        </div>
+    <Screen title="Check in" sub={`${s.parent_name}’s home`} back="/c" backLabel="Today"
+      footer={<>
+        <ErrorBox msg={err} />
+        <Btn className="lg block" busy={busy} busyText="Checking in" disabled={!loc || !photo} onClick={confirm}>Confirm check-in</Btn>
+        {missing && <p className="t-xs faint center">{missing}</p>}
+      </>}>
+      <div className="stack-lg">
+        <section className="panel pad">
+          <div className={'cstep' + (loc ? ' done' : '')}>
+            <span className="n">{loc ? <Icon name="check" size="sm" /> : 1}</span>
+            <div className="grow">
+              <h2>Your location</h2>
+              <p className="t-sm muted" role="status">{loc ? `Found, accurate to ${Math.round(loc.acc)} m.` : locErr ? locErr : 'Finding where you are…'}</p>
+              {locErr && <button className="btn secondary sm" style={{ marginTop: 10 }} onClick={locate}><Icon name="refresh" size="sm" />Try again</button>}
+            </div>
+          </div>
+          <div className={'locmap ' + (loc ? 'found' : locErr ? 'failed' : 'finding')} aria-hidden="true">
+            <span className="ring" /><span className="ring r2" /><span className="pin"><Icon name="pinfill" className="" /></span>
+          </div>
+        </section>
+        <section className="panel pad">
+          <div className={'cstep' + (photo ? ' done' : '')}>
+            <span className="n">{photo ? <Icon name="check" size="sm" /> : 2}</span>
+            <div className="grow"><h2>Photo at the front door</h2><p className="t-sm muted">Stand at the door so the family can see you arrived.</p></div>
+          </div>
+          <div className="camera">
+            {photo && <img src={photo.url} alt="Your check-in photo" />}
+            {!photo && <span className="frame" />}
+            <label htmlFor="door-photo" className={photo ? 'retake' : ''}>
+              {photo ? <><Icon name="cam" size="sm" />Retake</> : <><span className="cam-ic"><Icon name="cam" /></span>Take photo</>}
+            </label>
+            <input id="door-photo" className="sr" type="file" accept="image/*" capture="environment" onChange={e => { onPhoto(e.target.files?.[0]); e.target.value = ''; }} />
+          </div>
+        </section>
       </div>
-      <div className="camera">
-        {photo && <img src={photo.url} alt="Your check-in photo" />}
-        <span className="frame" />
-        <label htmlFor="door-photo" style={photo ? { alignSelf: 'end', background: 'rgba(28,38,35,.7)', borderRadius: 12, padding: '8px 14px', margin: 12 } : undefined}>
-          {!photo && <Icon name="cam" />}
-          {photo ? 'Retake photo' : 'Take a photo at the front door'}
-        </label>
-        <input id="door-photo" className="sr" type="file" accept="image/*" capture="environment" onChange={e => onPhoto(e.target.files?.[0])} />
-      </div>
-      <ErrorBox msg={err} />
-      <button className="btn" disabled={!loc || !photo || busy} onClick={confirm}>{busy ? 'Checking in…' : 'Confirm check-in'}</button>
-      {(!loc || !photo) && <p className="tiny center" style={{ margin: 0 }}>Location and a photo are both needed to check in.</p>}
-    </main></div>
+    </Screen>
   );
 }

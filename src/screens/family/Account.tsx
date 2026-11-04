@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { q, rpc, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { useLive } from '../../lib/hooks';
-import { shortDate } from '../../lib/format';
+import { useInstall } from '../../lib/pwa';
+import { initials, shortDate } from '../../lib/format';
 import Icon from '../../components/Icon';
-import { AppBar, ErrorBox, Loading } from '../../components/ui';
+import { Avatar, Confirm, ErrorBox, Pill, useToast } from '../../components/ui';
+import { Screen, ScreenLoading, useAttention } from '../../components/layout';
 
 export default function Account() {
   const { profile, session, signOut } = useAuth();
+  const { notify } = useAttention();
+  const install = useInstall();
+  const toast = useToast();
   const nav = useNavigate();
   const { data: parents, loading } = useLive(() => q<any[]>(supabase.from('parents').select('id, name, consent_at').order('created_at')), [], 0);
   const [confirm, setConfirm] = useState(false);
@@ -18,7 +23,7 @@ export default function Account() {
   async function close() {
     setBusy(true); setErr(null);
     try {
-      // Remove check-in photos first: Supabase only allows deleting stored files through the storage API.
+      // Check-in photos are deleted through the storage API first; the database function then removes everything else.
       const ids = (parents ?? []).map(p => p.id);
       if (ids.length) {
         const visits = await q<any[]>(supabase.from('visits').select('photo_path').in('parent_id', ids).not('photo_path', 'is', null).neq('photo_path', 'sample'));
@@ -28,38 +33,71 @@ export default function Account() {
       await rpc('close_account');
       await signOut();
       nav('/login', { replace: true });
-    } catch (x: any) { setErr(x.message); setBusy(false); }
+    } catch (x: any) { setErr(x.message); setBusy(false); setConfirm(false); }
   }
 
-  if (loading) return <div className="shell"><Loading /></div>;
+  if (loading) return <ScreenLoading title="Account" blocks={[80, 140, 180]} />;
   return (
-    <div className="shell"><main className="page stack">
-      <AppBar title="Account and privacy" back="/f" />
-      <div className="surface"><b>{profile?.full_name}</b><div className="tiny">{session?.user.email}</div>
-        <button className="btn ghost sm" style={{ marginTop: 12 }} onClick={async () => { await signOut(); nav('/login'); }}><Icon name="logout" size="sm" />Sign out</button></div>
-      <div className="surface"><b>Who can see health readings</b>
-        <div className="kv"><span>You</span><span>Yes</span></div>
-        <div className="kv"><span>Your KinCare coordinator</span><span>Yes</span></div>
-        <div className="kv"><span>Caregiver on shift</span><span>Only during the shift</span></div>
-        <div className="kv"><span>Anyone else</span><span>No</span></div>
-        {parents?.map(p => <p key={p.id} className="tiny" style={{ margin: '6px 0 0' }}>Consent for {p.name} recorded on {shortDate(p.consent_at)}.</p>)}
+    <Screen title="Account">
+      <div className="stack-lg">
+        <div className="panel flush">
+          <div className="li"><Avatar text={initials(profile?.full_name)} tone="brand" size="lg" />
+            <span className="li-t"><b>{profile?.full_name}</b><span>{session?.user.email}</span></span>
+            <button className="btn secondary sm" onClick={async () => { await signOut(); nav('/login', { replace: true }); }}><Icon name="logout" size="sm" />Sign out</button></div>
+        </div>
+
+        <section className="section" aria-labelledby="dev-h">
+          <div className="sec-head"><h2 id="dev-h">This device</h2></div>
+          <div className="panel flush">
+            <div className="li">
+              <span className="av grey"><Icon name="bell" size="sm" /></span>
+              <span className="li-t"><b>Alert notifications</b><span>{!notify.supported ? 'This browser cannot show notifications. Alerts still appear in the app.' : notify.blocked ? 'Blocked for this site. Allow notifications in your browser settings.' : 'A missed check-in or SOS shows on this device while KinCare is open.'}</span></span>
+              <button className="switch" role="switch" aria-checked={notify.on} aria-label="Alert notifications" disabled={!notify.supported} onClick={notify.toggle} />
+            </div>
+            <div className="li">
+              <span className="av grey"><Icon name="download" size="sm" /></span>
+              <span className="li-t"><b>KinCare on your home screen</b><span>{install.installed ? 'Installed. You are using the app.' : install.canPrompt ? 'Opens like an app, full screen, one tap from your home screen.' : install.ios ? 'In Safari, tap Share, then Add to Home Screen.' : 'In your browser menu, choose Install app or Add to Home Screen.'}</span></span>
+              {install.installed ? <Pill tone="ok">Installed</Pill> : install.canPrompt && <button className="btn secondary sm" onClick={async () => { if (await install.prompt()) toast('KinCare is installed'); }}>Install</button>}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="priv-h">
+          <div className="sec-head"><h2 id="priv-h">Who can see health readings</h2></div>
+          <div className="panel">
+            <div className="kv"><span>You</span><span>Always</span></div>
+            <div className="kv"><span>Your KinCare coordinator</span><span>Always</span></div>
+            <div className="kv"><span>The caregiver on shift</span><span>Only during the shift</span></div>
+            <div className="kv"><span>Anyone else</span><span>Never</span></div>
+          </div>
+          {parents?.map(p => <p key={p.id} className="note" style={{ padding: '0 2px' }}><Icon name="check" size="sm" /><span>Consent for {p.name} recorded on {shortDate(p.consent_at)}.</span></p>)}
+        </section>
+
+        <section className="section" aria-labelledby="soon-h">
+          <div className="sec-head"><h2 id="soon-h">Planned for later</h2></div>
+          <div className="panel flush">
+            <div className="li"><span className="av grey"><Icon name="pill" size="sm" /></span><span className="li-t"><b>Medicine delivery</b><span>From pharmacies near your parent. Not part of this version.</span></span></div>
+            <div className="li"><span className="av grey"><Icon name="bowl" size="sm" /></span><span className="li-t"><b>Grocery delivery</b><span>Weekly essentials to their door. Not part of this version.</span></span></div>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="close-h">
+          <div className="sec-head"><h2 id="close-h">Close account</h2></div>
+          <div className="panel pad danger-zone">
+            <p className="t-sm muted">Closing your account permanently deletes:</p>
+            <ul className="del-list">
+              <li><Icon name="trash" size="sm" />Your parents’ profiles, addresses and care needs</li>
+              <li><Icon name="trash" size="sm" />Every blood pressure and sugar reading</li>
+              <li><Icon name="trash" size="sm" />Check-in photos, locations and booking history</li>
+            </ul>
+            <ErrorBox msg={err} />
+            <button className="btn danger-outline" style={{ marginTop: 16 }} onClick={() => setConfirm(true)}>Close account and delete data</button>
+          </div>
+        </section>
       </div>
-      <div className="surface"><b>Close account</b>
-        <p className="small muted" style={{ margin: '4px 0 10px' }}>This permanently deletes:</p>
-        <ul className="delete-list">
-          <li><Icon name="trash" size="sm" />Your parents' profiles, addresses and care needs</li>
-          <li><Icon name="trash" size="sm" />All BP and sugar readings</li>
-          <li><Icon name="trash" size="sm" />All check-in photos and locations, and booking history</li>
-        </ul>
-        <ErrorBox msg={err} />
-        {!confirm
-          ? <button className="btn danger" style={{ marginTop: 12 }} onClick={() => setConfirm(true)}>Close account and delete data</button>
-          : <div className="stack" style={{ marginTop: 12 }}>
-              <p className="small" style={{ margin: 0 }}><b>This cannot be undone.</b> Delete everything now?</p>
-              <button className="btn danger" disabled={busy} onClick={close}>{busy ? 'Deleting…' : 'Yes, delete everything'}</button>
-              <button className="btn ghost" onClick={() => setConfirm(false)}>Keep my account</button>
-            </div>}
-      </div>
-    </main></div>
+      <Confirm open={confirm} tone="danger" busy={busy} title="Delete everything?"
+        body="Your account, your parents’ profiles, readings and photos will be deleted now. This cannot be undone."
+        confirmLabel="Delete everything" busyLabel="Deleting" cancelLabel="Keep my account" onConfirm={close} onClose={() => setConfirm(false)} />
+    </Screen>
   );
 }

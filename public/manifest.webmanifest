@@ -4,7 +4,7 @@
   "description": "Verified caregivers and proof of every visit.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F1F6F2",
+  "background_color": "#F3F5F3",
   "theme_color": "#1F4D3B",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
