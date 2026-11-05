@@ -5,6 +5,7 @@ import { AttentionProvider } from './components/layout';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import DemoReset from './screens/auth/DemoReset';
+import Landing from './screens/landing/Landing';
 import { BookingProvider } from './screens/family/booking';
 import FamilyHome from './screens/family/Home';
 import AddParent from './screens/family/AddParent';
@@ -46,7 +47,7 @@ function Guard({ role, children }: { role: Role | Role[]; children: JSX.Element 
 function Start() {
   const { session, profile, ready } = useAuth();
   if (!ready || (session && !profile)) return <Boot />;
-  return <Navigate to={session && profile ? HOME[profile.role] : '/login'} replace />;
+  return session && profile ? <Navigate to={HOME[profile.role]} replace /> : <Landing />;
 }
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/demo" element={<DemoReset />} />
+      <Route path="/about" element={<Landing />} />
 
       <Route path="/f/*" element={<Guard role="family"><BookingProvider><Routes>
         <Route index element={<FamilyHome />} />

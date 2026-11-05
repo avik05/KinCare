@@ -38,7 +38,7 @@ export default function DemoReset() {
     <div className="auth">
       <AuthSide />
       <main className="auth-main">
-        <div className="logo"><BrandMark /><b>KinCare</b></div>
+        <Link className="logo" to="/" aria-label="KinCare home"><BrandMark /><b>KinCare</b></Link>
         {state === 'busy' && (
           <div className="center" role="status">
             <span className="mini-spin" style={{ width: 32, height: 32, borderWidth: 3, margin: '8px auto 20px', display: 'block' }} />

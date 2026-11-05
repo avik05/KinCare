@@ -30,7 +30,7 @@ export default function SignUp() {
     <div className="auth">
       <AuthSide />
       <main className="auth-main">
-        <div className="logo"><BrandMark /><b>KinCare</b></div>
+        <Link className="logo" to="/" aria-label="KinCare home"><BrandMark /><b>KinCare</b></Link>
         {sent ? (
           <div className="center">
             <DoneMark />

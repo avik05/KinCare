@@ -20,7 +20,7 @@ export const DEMO_PW = 'KinCare@2026';
 export function AuthSide() {
   return (
     <aside className="auth-side">
-      <div className="logo"><BrandMark on="dark" /><b>KinCare</b></div>
+      <Link className="logo" to="/" aria-label="KinCare home"><BrandMark on="dark" /><b>KinCare</b></Link>
       <h2>Know every visit happened.</h2>
       <p className="a-lede">Verified caregivers for your parents in another city. Each visit is checked in at the door with the time, location and a photo, and you are alerted within 30 minutes if no one arrives.</p>
       <ProofCard img={<DoorPhoto />} tags={[{ icon: 'clock', text: '8:04 am' }, { icon: 'pin', text: 'Within 12 m of home' }]}>
@@ -56,7 +56,7 @@ export default function Login() {
     <div className="auth">
       <AuthSide />
       <main className="auth-main">
-        <div className="logo"><BrandMark /><b>KinCare</b></div>
+        <Link className="logo" to="/" aria-label="KinCare home"><BrandMark /><b>KinCare</b></Link>
         <h1>Sign in</h1>
         <p className="lede">Welcome back. Use the email you registered with.</p>
         <form className="stack" style={{ marginTop: 24, gap: 16 }} onSubmit={submit} noValidate={false}>

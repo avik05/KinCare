@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { q, rpc, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { useLive } from '../../lib/hooks';
@@ -80,6 +80,10 @@ export default function Account() {
             <div className="li"><span className="av grey"><Icon name="bowl" size="sm" /></span><span className="li-t"><b>Grocery delivery</b><span>Weekly essentials to their door. Not part of this version.</span></span></div>
           </div>
         </section>
+
+        <div className="panel flush">
+          <Link className="li" to="/about"><span className="av grey"><Icon name="info" size="sm" /></span><span className="li-t"><b>About KinCare</b><span>How it works, pricing and privacy</span></span><Icon name="chev" size="sm" className="ic-sm chev" /></Link>
+        </div>
 
         <section className="section" aria-labelledby="close-h">
           <div className="sec-head"><h2 id="close-h">Close account</h2></div>

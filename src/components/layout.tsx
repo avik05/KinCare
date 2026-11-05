@@ -151,6 +151,7 @@ function UserMenu({ placement }: { placement: 'up' | 'down' }) {
               <Icon name="bell" size="sm" />Alert notifications<span className="switch" aria-hidden="true" aria-checked={notify.on} />
             </button>
           )}
+          <Link className="m-item" role="menuitem" to="/about" onClick={() => setOpen(false)}><Icon name="info" size="sm" />About KinCare</Link>
           <div className="m-sep" />
           <button className="m-item danger" role="menuitem" onClick={out}><Icon name="logout" size="sm" />Sign out</button>
         </div>
