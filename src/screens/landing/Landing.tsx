@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { HOME, useAuth } from '../../lib/auth';
 import Icon from '../../components/Icon';
 import { Avatar, BrandMark, DoorPhoto } from '../../components/ui';
+import { Calculator, CallForm, Simulator } from './parts';
 import './landing.css';
 
 /** The public front page: what KinCare does, for sons and daughters arranging care for a parent in another city. */
@@ -30,7 +31,7 @@ export default function Landing() {
         <div className="lp-wrap">
           <Link className="logo" to="/" aria-label="KinCare home"><BrandMark /><b>KinCare</b></Link>
           <nav className="lp-links" aria-label="On this page">
-            <a href="#how">How it works</a><a href="#proof">Visit records</a><a href="#pricing">Pricing</a><a href="#questions">Questions</a>
+            <a href="#how">How it works</a><a href="#proof">Visit records</a><a href="#pricing">Pricing</a><a href="#questions">Questions</a><a href="#call">Request a call</a>
           </nav>
           <div className="lp-nav-cta">
             {signedIn
@@ -125,14 +126,9 @@ export default function Landing() {
           <div className="lp-wrap">
             <div className="lp-sec-head">
               <h2 id="miss-h" className="lp-h2">If no one turns up, we act. You do not have to.</h2>
-              <p className="lp-lede">Today, a missed visit usually means a worried call from a neighbour hours later. With KinCare, the clock starts the moment a shift begins.</p>
+              <p className="lp-lede">Today, a missed visit usually means a worried call from a neighbour hours later. Here is the same morning with KinCare, from all four sides. Drag the clock or press play.</p>
             </div>
-            <div className="lp-clock">
-              <div className="lp-tick-row"><span className="k" /><time>8:00 am</time><h3>The shift starts</h3><p>The caregiver is due at your parent’s door.</p></div>
-              <div className="lp-tick-row bad"><span className="k" /><time>8:30 am</time><h3>No check-in, so you are alerted</h3><p>You and your coordinator are told at the same moment, on your phone.</p></div>
-              <div className="lp-tick-row ok"><span className="k" /><time>12:30 pm</time><h3>A replacement is at the door</h3><p>A verified caregiver nearby is sent within 4 hours of the alert.</p></div>
-              <div className="lp-tick-row warn"><span className="k" /><time>If not</time><h3>It goes to the top</h3><p>If the replacement misses too, the head of care operations takes it over.</p></div>
-            </div>
+            <Simulator />
           </div>
         </section>
 
@@ -184,16 +180,12 @@ export default function Landing() {
                   <li><Icon name="check" size="sm" />A verified replacement within 4 hours</li>
                   <li><Icon name="check" size="sm" />A coordinator in your parent’s city, and an SOS screen for them</li>
                 </ul>
-              </article>
-              <article className="lp-plan">
-                <span className="what">Caregiver’s day rate</span>
-                <p className="muted" style={{ marginTop: 10 }}>Each caregiver sets their rate based on experience. You see it on their profile before you choose.</p>
                 <div className="lp-rates">
-                  <div className="lp-rate"><span>12-hour day shift, 8 am to 8 pm</span><b>₹850 to ₹1,200</b></div>
-                  <div className="lp-rate"><span>24-hour live-in care</span><b>₹1,500 to ₹1,900</b></div>
+                  <div className="lp-rate"><span>Plus the caregiver’s day rate, 12-hour shift</span><b>₹850 to ₹1,200</b></div>
+                  <div className="lp-rate"><span>Or 24-hour live-in care</span><b>₹1,500 to ₹1,900</b></div>
                 </div>
-                <div className="lp-example">For example: 14 day shifts at ₹1,100 come to ₹15,400. With the membership, the total is <b>₹17,399</b> for two weeks of care.</div>
               </article>
+              <Calculator />
             </div>
           </div>
         </section>
@@ -225,17 +217,18 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="lp-wrap" style={{ paddingBottom: 24 }} aria-labelledby="close-h">
+        <section className="lp-wrap" id="call" style={{ paddingBottom: 24, scrollMarginTop: 80 }} aria-labelledby="close-h">
           <div className="lp-close">
             <div>
               <h2 id="close-h">Start with one parent and two weeks.</h2>
               <p>Add them in a few minutes, see verified caregivers near them, and watch the first visit come in.</p>
+              <div className="lp-ctas">
+                {signedIn
+                  ? <Link className="btn" to={HOME[profile!.role]}>Open my KinCare</Link>
+                  : <><Link className="btn" to="/signup">Create a family account</Link><Link className="btn ghost" to="/login">Sign in</Link></>}
+              </div>
             </div>
-            <div className="lp-ctas">
-              {signedIn
-                ? <Link className="btn" to={HOME[profile!.role]}>Open my KinCare</Link>
-                : <><Link className="btn" to="/signup">Create a family account</Link><Link className="btn ghost" to="/login">Sign in</Link></>}
-            </div>
+            <CallForm />
           </div>
         </section>
       </main>

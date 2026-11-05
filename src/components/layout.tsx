@@ -10,8 +10,8 @@ export const ROLE_LABEL: Record<Role, string> = { family: 'Family', elder: 'Elde
 
 /* ---------- attention: open alert counts and alert notifications ---------- */
 
-type Attn = { open: number; escalated: number; notify: { supported: boolean; on: boolean; blocked: boolean; toggle: () => void }; refresh: () => void };
-const AttnCtx = createContext<Attn>({ open: 0, escalated: 0, notify: { supported: false, on: false, blocked: false, toggle: () => {} }, refresh: () => {} });
+type Attn = { open: number; escalated: number; calls: number; notify: { supported: boolean; on: boolean; blocked: boolean; toggle: () => void }; refresh: () => void };
+const AttnCtx = createContext<Attn>({ open: 0, escalated: 0, calls: 0, notify: { supported: false, on: false, blocked: false, toggle: () => {} }, refresh: () => {} });
 export const useAttention = () => useContext(AttnCtx);
 
 const NOTIFY_KEY = 'kincare-notify';
@@ -34,7 +34,8 @@ export function AttentionProvider({ children }: { children: ReactNode }) {
   const toast = useToast();
   const role = profile?.role;
   const watch = role === 'family' || role === 'coordinator' || role === 'admin';
-  const [counts, setCounts] = useState({ open: 0, escalated: 0 });
+  const [counts, setCounts] = useState({ open: 0, escalated: 0, calls: 0 });
+  const seenCalls = useRef<Set<string> | null>(null);
   const [on, setOn] = useState(readPref);
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>(canNotify() ? Notification.permission : 'unsupported');
   const seen = useRef<Set<string> | null>(null);
@@ -43,7 +44,19 @@ export function AttentionProvider({ children }: { children: ReactNode }) {
     if (!watch) return;
     const { data } = await supabase.from('alerts').select('id, type, level, parent:parents(name, relation)').is('resolved_at', null);
     if (!data) return;
-    setCounts({ open: data.length, escalated: data.filter((a: any) => a.level === 'escalated').length });
+    let calls = 0;
+    if (role !== 'family') {
+      const { data: cb } = await supabase.from('callbacks').select('id, name, city').eq('status', 'new');
+      if (cb) {
+        calls = cb.length;
+        if (seenCalls.current) for (const c of cb as any[]) if (!seenCalls.current.has(c.id)) {
+          toast(`New call request from ${c.name}`);
+          if (readPref()) systemNotify(`Call request: ${c.name}`, `Parent in ${c.city}. Call back today.`, '/k/calls', c.id);
+        }
+        seenCalls.current = new Set(cb.map((c: any) => c.id));
+      }
+    }
+    setCounts({ open: data.length, escalated: data.filter((a: any) => a.level === 'escalated').length, calls });
     const ids = new Set<string>(data.map((a: any) => a.id));
     if (seen.current) {
       for (const a of data as any[]) {
@@ -61,7 +74,7 @@ export function AttentionProvider({ children }: { children: ReactNode }) {
   }, [watch, role]);
 
   useEffect(() => {
-    seen.current = null; setCounts({ open: 0, escalated: 0 });
+    seen.current = null; seenCalls.current = null; setCounts({ open: 0, escalated: 0, calls: 0 });
     if (!watch) return;
     poll();
     const id = setInterval(() => { if (document.visibilityState === 'visible' || readPref()) poll(); }, 20000);
@@ -88,13 +101,14 @@ export function AttentionProvider({ children }: { children: ReactNode }) {
 
 /* ---------- navigation ---------- */
 
-type NavItem = { to: string; label: string; icon: string; active: boolean; count?: number };
+type NavItem = { to: string; label: string; short?: string; icon: string; active: boolean; count?: number };
 function useNav(): NavItem[] {
   const { profile } = useAuth();
   const p = useLocation().pathname.replace(/\/$/, '');
-  const { open, escalated } = useAttention();
+  const { open, escalated, calls: newCalls } = useAttention();
   const alerts = { to: '/k', label: 'Alerts', icon: 'bell', active: p === '/k' || p.startsWith('/k/alert') || p.startsWith('/k/assign'), count: open };
   const cgs = { to: '/k/caregivers', label: 'Caregivers', icon: 'users', active: p.startsWith('/k/caregivers') };
+  const calls = { to: '/k/calls', label: 'Call requests', short: 'Calls', icon: 'phone', active: p.startsWith('/k/calls'), count: newCalls };
   switch (profile?.role) {
     case 'family': return [
       { to: '/f', label: 'Home', icon: 'home', active: p === '/f' || p.startsWith('/f/alert') || p.startsWith('/f/renew') || p.startsWith('/f/add-parent'), count: open },
@@ -103,11 +117,11 @@ function useNav(): NavItem[] {
       { to: '/f/account', label: 'Account', icon: 'user', active: p.startsWith('/f/account') },
     ];
     case 'caregiver': return [{ to: '/c', label: 'Today', icon: 'cal', active: true }];
-    case 'coordinator': return [alerts, cgs];
+    case 'coordinator': return [alerts, calls, cgs];
     case 'admin': return [
       { to: '/a', label: 'Overview', icon: 'chart', active: p === '/a' },
       { to: '/a/escalations', label: 'Escalations', icon: 'escal', active: p.startsWith('/a/escalations'), count: escalated },
-      alerts, cgs,
+      alerts, calls, cgs,
       { to: '/a/settings', label: 'Settings', icon: 'gear', active: p.startsWith('/a/settings') },
     ];
     default: return [];
@@ -183,7 +197,7 @@ function TabBar({ items }: { items: NavItem[] }) {
     <nav className="tabbar" aria-label="Main">
       {items.map(i => (
         <Link key={i.to} to={i.to} aria-current={i.active ? 'page' : undefined}>
-          <Icon name={i.icon} />{i.label}{!!i.count && <span className="tdot" aria-label={`${i.count} open`} />}
+          <Icon name={i.icon} />{i.short ?? i.label}{!!i.count && <span className="tdot" aria-label={`${i.count} open`} />}
         </Link>
       ))}
     </nav>

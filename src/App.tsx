@@ -25,6 +25,7 @@ import ElderHome from './screens/elder/Home';
 import SosSent from './screens/elder/SosSent';
 import AlertQueue from './screens/coordinator/Alerts';
 import Caregivers from './screens/coordinator/Caregivers';
+import Calls from './screens/coordinator/Calls';
 import AddCaregiver from './screens/coordinator/AddCaregiver';
 import Kpis from './screens/admin/Kpis';
 import Escalations from './screens/admin/Escalations';
@@ -95,6 +96,7 @@ export default function App() {
         <Route path="alert/:alertId" element={<AlertQueue />} />
         <Route path="assign/:alertId" element={<AlertQueue />} />
         <Route path="caregivers" element={<Caregivers />} />
+        <Route path="calls" element={<Calls />} />
         <Route path="caregivers/new" element={<AddCaregiver />} />
       </Routes></Guard>} />
 
