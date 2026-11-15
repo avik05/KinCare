@@ -47,6 +47,13 @@ export function UatBar() {
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now());
   const logged = useRef(false);
+  const bar = useRef<HTMLDivElement>(null);
+  // Push the app down by the bar's real height, so the bar never covers a page title.
+  useEffect(() => {
+    const el = bar.current; if (!el) return;
+    const set = () => document.documentElement.style.setProperty('--uat-h', el.offsetHeight + 'px');
+    set(); const ro = new ResizeObserver(set); ro.observe(el); return () => ro.disconnect();
+  });
 
   useEffect(() => { setU(readUat()); }, [loc.pathname]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
@@ -75,7 +82,7 @@ export function UatBar() {
   }
 
   return (
-    <div className="uat-bar" role="region" aria-label="Test task">
+    <div className="uat-bar" role="region" aria-label="Test task" ref={bar}>
       {!open ? (
         <div className="uat-in">
           <div className="uat-t"><span className="uat-k">Task {u.task} of 3 · {fmt(now - u.at)}</span><b>{t.short}</b></div>
