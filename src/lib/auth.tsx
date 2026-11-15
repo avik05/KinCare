@@ -16,6 +16,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function loadProfile(s: Session | null) {
     if (!s) { setProfile(null); return; }
     const { data } = await supabase.from('profiles').select('id, role, full_name, phone, closed_at').eq('id', s.user.id).maybeSingle();
+    // B14 (v1.3): a closed account cannot be used again; sign it out and tell the login page why.
+    if (data?.closed_at) {
+      try { sessionStorage.setItem('kincare-closed', data.closed_at); } catch { /* storage blocked */ }
+      await supabase.auth.signOut(); setSession(null); setProfile(null); return;
+    }
     setProfile((data as Profile) ?? null);
   }
 

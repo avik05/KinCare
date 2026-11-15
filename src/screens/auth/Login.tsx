@@ -47,8 +47,13 @@ export default function Login() {
 
   async function signIn(em: string, pw: string, who: string) {
     setBusy(who); setErr(null);
-    const { error } = await supabase.auth.signInWithPassword({ email: em.trim(), password: pw });
-    if (error) { setBusy(null); setErr(cleanError(error.message)); }
+    const { data, error } = await supabase.auth.signInWithPassword({ email: em.trim(), password: pw });
+    if (error) { setBusy(null); setErr(cleanError(error.message)); return; }
+    const { data: pr } = await supabase.from('profiles').select('closed_at').eq('id', data.user.id).maybeSingle();
+    if (pr?.closed_at) {
+      setBusy(null);
+      setErr(`This account was closed on ${new Date(pr.closed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' })} and its data was deleted. It cannot be used again.`);
+    }
   }
   const submit = (e: FormEvent) => { e.preventDefault(); signIn(email, password, 'form'); };
 
