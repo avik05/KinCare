@@ -64,11 +64,16 @@ export default function CheckIn() {
     try {
       const path = `${s.parent_id}/${s.shift_id}/door-${Date.now()}.jpg`;
       const up = await supabase.storage.from('checkins').upload(path, photo.blob, { contentType: 'image/jpeg' });
-      if (up.error) throw new Error('The photo did not upload. Check your connection and try again.');
+      if (up.error) throw new Error(/fetch|network/i.test(up.error.message) ? up.error.message : 'The photo did not upload. Check your connection and try again.');
       await rpc('check_in', { p_shift: s.shift_id, p_lat: loc.lat, p_lng: loc.lng, p_accuracy: loc.acc, p_photo: path });
       toast('Checked in. The family can see it now');
       nav(`/c/visit/${s.shift_id}`, { replace: true });
-    } catch (x: any) { setErr(x.message); setBusy(false); }
+    } catch (x: any) {
+      // B12 (v1.3): say plainly that the connection dropped, and that the photo and location are kept for the retry.
+      const offline = !navigator.onLine || /fetch|network|load failed/i.test(String(x?.message));
+      setErr(offline ? 'No internet connection. Your photo and location are kept. Move to where you have signal and tap Confirm check-in again.' : x.message);
+      setBusy(false);
+    }
   }
 
   const missing = !loc && !photo ? 'Location and a door photo are both needed.' : !loc ? 'Waiting for your location.' : !photo ? 'Take the door photo to finish.' : '';
