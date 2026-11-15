@@ -30,6 +30,7 @@ import AddCaregiver from './screens/coordinator/AddCaregiver';
 import Kpis from './screens/admin/Kpis';
 import Escalations from './screens/admin/Escalations';
 import Settings from './screens/admin/Settings';
+import Try, { UatBar } from './screens/uat/uat';
 
 function Boot() {
   return <div className="boot" role="status" aria-label="Loading"><span className="spin" /></div>;
@@ -63,6 +64,7 @@ export default function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/demo" element={<DemoReset />} />
       <Route path="/about" element={<Landing />} />
+      <Route path="/try" element={<Try />} />
 
       <Route path="/f/*" element={<Guard role="family"><BookingProvider><Routes>
         <Route index element={<FamilyHome />} />
@@ -107,6 +109,6 @@ export default function App() {
       </Routes></Guard>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes></AttentionProvider>
+    </Routes><UatBar /></AttentionProvider>
   );
 }
