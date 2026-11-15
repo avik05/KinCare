@@ -29,7 +29,7 @@ export default function BookList() {
         <ErrorBox msg={error} />
         {p && <p className="t-sm muted" style={{ padding: '0 2px' }}>{data!.cgs.filter(c => !data!.busy.has(c.id)).length} free near {parentLabel(p)}’s pin code {p.pin_code}, for {draft.hours}-hour shifts from {shortDate(draft.start)}. Nearest first.</p>}
         {data?.cgs.length === 0
-          ? <div className="panel"><Empty icon="users" title="No verified caregivers nearby yet">Your coordinator has been told and will call you within a day. You can also try a different start date.</Empty></div>
+          ? <div className="panel"><Empty icon="users" title={`No caregivers near pin code ${p?.pin_code ?? ''} yet`}>KinCare has caregivers in Chennai (600…) and Kolkata (700…) for now. If this pin code is wrong, add {p ? parentLabel(p) : 'your parent'} again with the right one.</Empty></div>
           : <div className="panel flush">
               {data?.cgs.map(c => data.busy.has(c.id) ? (
                 <div key={c.id} className="li" aria-disabled="true" style={{ alignItems: 'flex-start', opacity: .55 }}>
