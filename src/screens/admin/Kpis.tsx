@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { rpc } from '../../lib/supabase';
-import { useLive, sweepNoShows } from '../../lib/hooks';
+import { useLive, withSweep } from '../../lib/hooks';
 import { time } from '../../lib/format';
 import Icon from '../../components/Icon';
 import { ErrorBox, Pill } from '../../components/ui';
@@ -24,7 +24,7 @@ function Kpi({ title, value, unit, pct, target, targetLabel, note, lowerIsBetter
 }
 
 export default function Kpis() {
-  const { data: k, loading, error } = useLive(async () => { await sweepNoShows(); return rpc<any>('kpis'); }, [], 30000);
+  const { data: k, loading, error } = useLive(() => withSweep(() => rpc<any>('kpis')), [], 30000);
   if (loading && !k) return <ScreenLoading title="Overview" blocks={[40, 240, 240]} />;
   const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : null);
   const rep = pct(k?.replaced_in_time ?? 0, k?.no_shows ?? 0);

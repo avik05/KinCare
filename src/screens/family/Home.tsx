@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
-import { useLive, sweepNoShows } from '../../lib/hooks';
+import { useLive, withSweep } from '../../lib/hooks';
 import { addDays, dayLabel, dayNum, firstName, greeting, initials, parentLabel, shortDate, time, todayIST, weekday } from '../../lib/format';
 import Icon from '../../components/Icon';
 import { Avatar, Empty, ErrorBox, Pill } from '../../components/ui';
@@ -41,7 +41,7 @@ export function parentStatus(parentId: string, data: Data): Status {
 
 export default function FamilyHome() {
   const { profile } = useAuth();
-  const { data, error, loading } = useLive(async () => { await sweepNoShows(); return loadFamilyOverview(); }, [], 15000);
+  const { data, error, loading } = useLive(() => withSweep(loadFamilyOverview), [], 15000);
   const [sel, setSel] = useState<string | null>(null);
   const today = todayIST();
   const title = `${greeting()}, ${firstName(profile?.full_name)}`;

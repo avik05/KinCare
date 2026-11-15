@@ -32,6 +32,12 @@ export function useLive<T>(load: () => Promise<T>, deps: any[] = [], every = 150
 }
 
 /** Runs the missed check-in sweep. The database also runs it every minute; this makes alerts appear immediately. */
-export async function sweepNoShows() {
-  try { await supabase.rpc('check_no_shows'); } catch { /* the cron job is the source of truth */ }
+export async function sweepNoShows(): Promise<number> {
+  try { const { data } = await supabase.rpc('check_no_shows'); return (data as number) || 0; } catch { return 0; /* the cron job is the source of truth */ }
+}
+
+/** v1.2 (B04): load a screen and run the sweep at the same time; load again only if the sweep marked a shift missed. */
+export async function withSweep<T>(load: () => Promise<T>): Promise<T> {
+  const [found, data] = await Promise.all([sweepNoShows(), load()]);
+  return found > 0 ? load() : data;
 }

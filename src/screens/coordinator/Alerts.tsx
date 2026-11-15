@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { q, rpc, supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
-import { useLive, sweepNoShows } from '../../lib/hooks';
+import { useLive, withSweep } from '../../lib/hooks';
 import { ago, firstName, minutesLeft, time, years } from '../../lib/format';
 import Icon from '../../components/Icon';
 import { Avatar, Btn, Checks, Empty, ErrorBox, Pill, useToast } from '../../components/ui';
 import { Screen, ScreenLoading, useAttention } from '../../components/layout';
 
-export async function loadAlerts() {
-  await sweepNoShows();
+export function loadAlerts() { return withSweep(loadAlertRows); }
+
+async function loadAlertRows() {
   const since = new Date(Date.now() - 24 * 3600e3).toISOString();
   return q<any[]>(supabase.from('alerts')
     .select('*, parent:parents(name, pin_code, address, emergency_contact, care_needs, family:profiles!parents_family_id_fkey(full_name, phone)), shift:shifts!alerts_shift_id_fkey(id, start_at, end_at, caregiver_id, caregiver:caregivers(name, phone))')
