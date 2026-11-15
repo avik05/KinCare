@@ -9,19 +9,22 @@ import { Screen, ScreenLoading } from '../../components/layout';
 
 type Ev = { key: string; at: string; kind: 'major' | 'small' | 'bad' | 'pending'; title: string; icon: string; body?: string; photo?: { path: string; acc?: number; lat?: number; lng?: number }; reading?: any };
 
+// v1.2 (B04): one round of parallel requests instead of five in a row. Visits and readings come embedded in the
+// shifts query; row-level security still applies to each embedded table.
 async function load(parentId?: string) {
-  const parents = await q<any[]>(supabase.from('parents').select('id, name, relation').order('created_at'));
-  const parent = parents.find(p => p.id === parentId) || parents[0];
-  if (!parent) return { parents, parent: null, days: [] as [string, Ev[]][] };
   const from = todayIST(-6), to = todayIST();
-  const [shifts, alerts, settings] = await Promise.all([
-    q<any[]>(supabase.from('shifts').select('id, status, start_at, end_at, shift_date, replacement_of, created_at, caregiver:caregivers(name)').eq('parent_id', parent.id).gte('shift_date', from).lte('shift_date', to)),
-    q<any[]>(supabase.from('alerts').select('*').eq('parent_id', parent.id).gte('raised_at', new Date(Date.now() - 7 * 864e5).toISOString())),
+  const [parents, allShifts, allAlerts, settings] = await Promise.all([
+    q<any[]>(supabase.from('parents').select('id, name, relation').order('created_at')),
+    q<any[]>(supabase.from('shifts').select('id, parent_id, status, start_at, end_at, shift_date, replacement_of, created_at, caregiver:caregivers(name), visit:visits(*, readings(*))').gte('shift_date', from).lte('shift_date', to)),
+    q<any[]>(supabase.from('alerts').select('*').gte('raised_at', new Date(Date.now() - 7 * 864e5).toISOString())),
     q<any>(supabase.from('settings').select('no_show_minutes').single()),
   ]);
-  const ids = shifts.map(s => s.id);
-  const visits = ids.length ? await q<any[]>(supabase.from('visits').select('*').in('shift_id', ids)) : [];
-  const readings = visits.length ? await q<any[]>(supabase.from('readings').select('*').in('visit_id', visits.map(v => v.id))) : [];
+  const parent = parents.find(p => p.id === parentId) || parents[0];
+  if (!parent) return { parents, parent: null, days: [] as [string, Ev[]][] };
+  const shifts = allShifts.filter(s => s.parent_id === parent.id);
+  const alerts = allAlerts.filter(a => a.parent_id === parent.id);
+  const visits = shifts.flatMap(s => (Array.isArray(s.visit) ? s.visit : s.visit ? [s.visit] : []));
+  const readings = visits.flatMap(v => v.readings || []);
 
   const evs: Ev[] = [];
   for (const s of shifts) {

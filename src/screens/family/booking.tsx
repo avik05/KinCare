@@ -20,28 +20,25 @@ export const useDraft = () => useContext(Ctx);
 export type ParentRow = { id: string; name: string; relation: string; age: number; address: string; pin_code: string; care_tasks: string[]; care_needs: string[] };
 
 /** Everything the family home needs, for all of this family's parents. */
+// v1.2 (B04): all requests go out together. Row-level security already limits every table to this family's parents.
 export async function loadFamilyOverview() {
   const today = todayIST();
-  const parents = await q<ParentRow[]>(supabase.from('parents').select('id, name, relation, age, address, pin_code, care_tasks, care_needs').order('created_at'));
-  const ids = parents.map(p => p.id);
-  if (!ids.length) return { parents, bookings: [] as any[], shifts: [] as any[], visits: [] as any[], alerts: [] as any[], readings: [] as any[], settings: { no_show_minutes: 30 } };
-  const [bookings, shifts, alerts, settings] = await Promise.all([
+  const [parents, bookings, shifts, alerts, settings] = await Promise.all([
+    q<ParentRow[]>(supabase.from('parents').select('id, name, relation, age, address, pin_code, care_tasks, care_needs').order('created_at')),
     q<any[]>(supabase.from('bookings').select('id, parent_id, shift_hours, start_date, end_date, days, status, rating, caregiver:caregivers(id, name, initials)')
-      .in('parent_id', ids).neq('status', 'cancelled').order('start_date', { ascending: false })),
-    q<any[]>(supabase.from('shifts').select('id, booking_id, parent_id, status, start_at, end_at, shift_date, replacement_of, caregiver:caregivers(name, initials)')
-      .in('parent_id', ids).gte('shift_date', todayIST(-20)).lte('shift_date', todayIST(20)).order('start_at')),
+      .neq('status', 'cancelled').order('start_date', { ascending: false })),
+    q<any[]>(supabase.from('shifts').select('id, booking_id, parent_id, status, start_at, end_at, shift_date, replacement_of, caregiver:caregivers(name, initials), visit:visits(id, shift_id, check_in_at, check_out_at, tasks, readings(visit_id, bp_systolic, bp_diastolic, sugar, recorded_at))')
+      .gte('shift_date', todayIST(-20)).lte('shift_date', todayIST(20)).order('start_at')),
     q<any[]>(supabase.from('alerts').select('id, parent_id, shift_id, type, level, raised_at, resolved_at, note, replacement_shift_id')
-      .in('parent_id', ids).or(`resolved_at.is.null,resolved_at.gte.${new Date(Date.now() - 12 * 3600e3).toISOString()}`).order('raised_at', { ascending: false })),
+      .or(`resolved_at.is.null,resolved_at.gte.${new Date(Date.now() - 12 * 3600e3).toISOString()}`).order('raised_at', { ascending: false })),
     q<any>(supabase.from('settings').select('no_show_minutes').single()),
   ]);
-  const todayShiftIds = shifts.filter(s => s.shift_date === today).map(s => s.id);
-  const visits = todayShiftIds.length
-    ? await q<any[]>(supabase.from('visits').select('id, shift_id, check_in_at, check_out_at, tasks').in('shift_id', todayShiftIds))
-    : [];
-  const readings = visits.length
-    ? await q<any[]>(supabase.from('readings').select('visit_id, bp_systolic, bp_diastolic, sugar, recorded_at').in('visit_id', visits.map(v => v.id)).order('recorded_at', { ascending: false }))
-    : [];
-  return { parents, bookings, shifts, visits, alerts, readings, settings };
+  const ids = new Set(parents.map(p => p.id));
+  const own = <T extends { parent_id: string }>(rows: T[]) => rows.filter(r => ids.has(r.parent_id));
+  const myShifts = own(shifts);
+  const visits = myShifts.filter(s => s.shift_date === today).flatMap(s => (Array.isArray(s.visit) ? s.visit : s.visit ? [s.visit] : []));
+  const readings = visits.flatMap(v => v.readings || []).sort((x: any, y: any) => y.recorded_at.localeCompare(x.recorded_at));
+  return { parents, bookings: own(bookings), shifts: myShifts, visits, alerts: own(alerts), readings, settings };
 }
 
 export function currentBooking(bookings: any[], parentId: string) {
