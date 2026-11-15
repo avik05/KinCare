@@ -47,7 +47,9 @@ export async function loadFamilyOverview() {
 export function currentBooking(bookings: any[], parentId: string) {
   const today = todayIST();
   return bookings.find(b => b.parent_id === parentId && b.status === 'active' && b.start_date <= today && b.end_date >= today)
-    || bookings.find(b => b.parent_id === parentId && b.status === 'active' && b.start_date > today)
+    // B02 (v1.1): the next block to start, not the latest one booked
+    || bookings.filter(b => b.parent_id === parentId && b.status === 'active' && b.start_date > today)
+         .sort((a, b) => a.start_date.localeCompare(b.start_date))[0]
     || null;
 }
 
